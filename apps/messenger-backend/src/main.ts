@@ -5,8 +5,16 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    /** Global prefix */
+    app.setGlobalPrefix('api');
+
+    /** Config Service */
     const config = app.get(ConfigService);
-    const port = config.get('API_PORT', 5000);
+
+    /** Main Api Port */
+    const port = config.get<number>('API_PORT', 5000);
+
     await app.listen(port, () => {
         Logger.log(`Main app started on "${port}" port`, 'Main');
     });
