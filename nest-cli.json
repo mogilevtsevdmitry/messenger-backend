@@ -1,22 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/messenger-backend/src",
+  "sourceRoot": "apps/gateaway/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/messenger-backend/tsconfig.app.json"
+    "tsConfigPath": "apps/gateaway/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/messenger-backend",
+  "root": "apps/gateaway",
   "projects": {
-    "messenger-backend": {
+    "gateaway": {
       "type": "application",
-      "root": "apps/messenger-backend",
+      "root": "apps/gateaway",
       "entryFile": "main",
-      "sourceRoot": "apps/messenger-backend/src",
+      "sourceRoot": "apps/gateaway/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/messenger-backend/tsconfig.app.json"
+        "tsConfigPath": "apps/gateaway/tsconfig.app.json"
       }
     },
     "auth": {
