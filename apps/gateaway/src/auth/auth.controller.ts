@@ -1,9 +1,10 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
 import { Public } from '@shared/decorators';
+import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
 
+@Public()
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -23,10 +24,10 @@ export class AuthController {
         summary: 'Регистрация email',
         description: 'Регистрация с помощью email и пароля',
     })
-    @Public()
     @ApiBody({ type: RegisterWithEmailUserDto })
     @Post('register/email')
     async registerByEmail(@Body() data: RegisterWithEmailUserDto) {
+        console.log({ cmd: 'register-email' }, data);
         return this.client.send({ cmd: 'register-email' }, data);
     }
 
