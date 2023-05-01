@@ -29,7 +29,7 @@ export class AuthService {
         return login(loginUserDto, this.client, this.tokenService);
     }
 
-    register(registerUserDto: { email: string }) {
+    register(registerUserDto: { email: string; password: string }) {
         return register(registerUserDto, this.client);
     }
 

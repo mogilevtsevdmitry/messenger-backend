@@ -15,7 +15,6 @@ export class AuthController {
 
     @MessagePattern({ cmd: 'register-email' })
     regiaterEmail(registerUserDto) {
-        console.log({ registerUserDto });
         return this.authService.register(registerUserDto);
     }
 }

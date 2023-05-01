@@ -1,7 +1,9 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '@shared/decorators';
+import { Response } from 'express';
+import { tap } from 'rxjs';
 import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
 
 @Public()
@@ -16,8 +18,19 @@ export class AuthController {
     })
     @ApiBody({ type: LoginUserDto })
     @Post('login')
-    async login(@Body() data: LoginUserDto) {
-        return this.client.send({ cmd: 'login' }, data);
+    async login(@Body() data: LoginUserDto, @Res() res: Response) {
+        return this.client.send({ cmd: 'login' }, data).pipe(
+            tap((tokens) => {
+                res.cookie('refreshtoken', tokens.refreshToken, {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: new Date(tokens.refreshToken.exp).getMilliseconds(),
+                });
+                res.send({
+                    accessToken: tokens.accessToken,
+                });
+            }),
+        );
     }
 
     @ApiOperation({
@@ -27,7 +40,6 @@ export class AuthController {
     @ApiBody({ type: RegisterWithEmailUserDto })
     @Post('register/email')
     async registerByEmail(@Body() data: RegisterWithEmailUserDto) {
-        console.log({ cmd: 'register-email' }, data);
         return this.client.send({ cmd: 'register-email' }, data);
     }
 
