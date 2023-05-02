@@ -1,7 +1,6 @@
 import { AuthHelper } from '@auth-app/services/auth.helper';
 import { TokenService } from '@auth-app/services/token.service';
-import { HttpException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { mergeMap, of, tap } from 'rxjs';
 
 export const login = (
@@ -12,7 +11,7 @@ export const login = (
     return client.send({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
-                throw new HttpException('message', 400, { cause: new Error('Email or password not valid') });
+                throw new RpcException('Email or password not valid');
             }
         }),
         mergeMap((user) => {
