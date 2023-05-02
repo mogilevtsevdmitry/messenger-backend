@@ -1,10 +1,11 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { BadRequestException, Body, Controller, HttpException, HttpStatus, Inject, Post, Res } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '@shared/decorators';
 import { Response } from 'express';
-import { tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
+import { error } from 'console';
 
 @Public()
 @ApiTags('Auth')
@@ -30,6 +31,13 @@ export class AuthController {
                     accessToken: tokens.accessToken,
                 });
             }),
+            catchError((err) => {
+                res.send({
+                    statusCode: HttpStatus.BAD_REQUEST,
+                    message: err,
+                }).status(HttpStatus.BAD_REQUEST);
+                return of(null);
+            }),
         );
     }
 
@@ -40,7 +48,11 @@ export class AuthController {
     @ApiBody({ type: RegisterWithEmailUserDto })
     @Post('register/email')
     async registerByEmail(@Body() data: RegisterWithEmailUserDto) {
-        return this.client.send({ cmd: 'register-email' }, data);
+        return this.client.send({ cmd: 'register-email' }, data).pipe(
+            catchError((err) => {
+                throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
+            }),
+        );
     }
 
     @ApiOperation({
