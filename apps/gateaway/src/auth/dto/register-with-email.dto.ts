@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsPasswordsMatchingConstraint } from '@shared/validators';
+import { IsEmail, IsNotEmpty, IsString, MinLength, Validate } from 'class-validator';
 
 export class RegisterWithEmailUserDto {
     @ApiProperty({ type: String, description: 'Email пользователя', example: faker.internet.email() })
@@ -10,6 +11,7 @@ export class RegisterWithEmailUserDto {
     @ApiProperty({ type: String, description: 'Пароль. Минимальная длина 6 символов', example: 'Pa$$w0rD' })
     @IsString()
     @MinLength(6)
+    @IsNotEmpty()
     password: string;
 
     @ApiProperty({
@@ -19,5 +21,7 @@ export class RegisterWithEmailUserDto {
     })
     @IsString()
     @MinLength(6)
+    @Validate(IsPasswordsMatchingConstraint)
+    @IsNotEmpty()
     confirmPassword: string;
 }
