@@ -1,11 +1,10 @@
-import { BadRequestException, Body, Controller, HttpException, HttpStatus, Inject, Post, Res } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { Body, Controller, HttpException, HttpStatus, Inject, Post, Res } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '@shared/decorators';
 import { Response } from 'express';
 import { catchError, of, tap } from 'rxjs';
 import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
-import { error } from 'console';
 
 @Public()
 @ApiTags('Auth')
