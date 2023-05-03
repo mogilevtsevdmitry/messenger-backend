@@ -7,7 +7,9 @@ export class IsPasswordsMatchingConstraint implements ValidatorConstraintInterfa
         return object.password === confirmPassword;
     }
 
+    // eslint-disable @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     defaultMessage(args: ValidationArguments) {
-        return 'Password mismatch';
+        return 'Пароли не совпадают';
     }
 }
