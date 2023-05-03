@@ -11,7 +11,7 @@ export const login = (
     return client.send({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
-                throw new RpcException('Email or password not valid');
+                throw new RpcException('Не верный email или пароль');
             }
         }),
         mergeMap((user) => {

@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             this.authService.validate(payload.userId).pipe(
                 map((user) => {
                     if (!user) {
-                        throw new UnauthorizedException(`User by id ${payload.userId} not found`);
+                        throw new UnauthorizedException(`Пользователь с id ${payload.userId} не найден`);
                     }
                     return user;
                 }),
