@@ -23,22 +23,22 @@ async function bootstrap() {
     /** Main Api Port */
     const port = config.get<number>('API_PORT', 5000);
 
+    /** Global prefix */
+    app.setGlobalPrefix('api');
+
+    /** Global validation */
+    app.useGlobalPipes(new ValidationPipe());
+
     // Swagger
     const swaggerConfig = new DocumentBuilder()
         .addBearerAuth()
         .setTitle('Noname Messenger')
         .setDescription('## API простого мессенджера')
         .setVersion('1.0')
-        .addServer(`http://localhost:${port}/api/`, 'local server')
+        .addServer(`http://localhost:${port}/`, 'local server')
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api-doc', app, document);
-
-    /** Global prefix */
-    app.setGlobalPrefix('api');
-
-    /** Global validation */
-    app.useGlobalPipes(new ValidationPipe());
 
     await app.listen(port, () => {
         Logger.log(`Main app started on "${port}" port`, 'MAIN');
