@@ -24,7 +24,6 @@ async function bootstrap() {
         .setDescription('## API простого мессенджера')
         .setVersion('1.0')
         .addServer(`http://localhost:${port}/api/`, 'local server')
-        .addServer('https://unknown-messenger.ru/api/', 'devapi server')
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api-doc', app, document);
