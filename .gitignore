@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 .vscode
 Messenger Backend.txt
+messenger_server*
