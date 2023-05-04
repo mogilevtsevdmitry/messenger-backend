@@ -7,7 +7,7 @@ import * as compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, { cors: { origin: 'https://unknown-messenger.ru' } });
+    const app = await NestFactory.create(AppModule, { cors: true });
     app.use(json({ limit: '100mb' }));
     app.use(compression());
 
