@@ -33,9 +33,9 @@ export class UserService {
     async findAll(opts?: QueryDto) {
         console.log(opts);
         return await this.prisma.user.findMany({
-            take: opts.take.get('user'),
+            // take: opts.take.get('user'),
             include: {
-                Token: opts.include.get('token'),
+                Token: opts,
             },
         });
     }

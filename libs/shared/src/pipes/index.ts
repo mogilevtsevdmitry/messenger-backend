@@ -1,1 +1,1 @@
-export * from './query.pipe'
+export * from './query.pipe';
