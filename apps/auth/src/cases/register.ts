@@ -5,15 +5,19 @@ export const register = (registerUserDto: { email: string; password: string }, c
     return client.send({ cmd: 'get-user-by-email' }, { email: registerUserDto.email }).pipe(
         tap((user) => {
             if (user) {
-                throw new RpcException(`User by email "${registerUserDto.email}" already exist`);
+                throw new RpcException(`Пользователь с email "${registerUserDto.email}" уже существует`);
             }
         }),
         mergeMap(() =>
             client.send({ cmd: 'create-user' }, registerUserDto).pipe(
                 map((_user) => {
                     if (!_user) {
-                        throw new RpcException(`Can not create user with dto ${JSON.stringify(registerUserDto)}`);
+                        throw new RpcException(
+                            `Ошибка при попытке создания пользователя с данными ${JSON.stringify(registerUserDto)}`,
+                        );
                     }
+                    // eslint-disable @typescript-eslint/no-unused-vars
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { password, ...user } = _user;
                     return user;
                 }),

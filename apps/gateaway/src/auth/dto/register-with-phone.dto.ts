@@ -8,6 +8,6 @@ export class RegisterWithPhoneUserDto {
         description: 'Телефонный номер пользователя',
         example: faker.phone.number('7-9##-###-####'),
     })
-    @IsPhoneNumber()
+    @IsPhoneNumber('RU', { message: 'Тел номер имеет не верный формат' })
     phone: string;
 }

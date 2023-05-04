@@ -1,0 +1,3 @@
+cd messenger-backend
+sudo ./deploy.sh
+exit

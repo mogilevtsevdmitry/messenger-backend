@@ -38,3 +38,4 @@ workspace.code-workspace
 .env
 .vscode
 Messenger Backend.txt
+messenger_server*
