@@ -42,7 +42,7 @@
         "@nestjs/swagger": "^6.3.0",
         "@nestjs/typeorm": "^9.0.1",
         "@prisma/client": "^4.13.0",
-        "@webmogilevtsev/messenger-api-dto": "^1.0.4",
+        "@webmogilevtsev/messenger-api-dto": "^1.0.6",
         "bcrypt": "^5.1.0",
         "body-parser": "^1.20.2",
         "class-transformer": "^0.5.1",

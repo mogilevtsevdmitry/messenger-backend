@@ -1,8 +1,8 @@
-import { NestFactory } from '@nestjs/core';
-import { AuthModule } from './auth.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AuthModule } from './auth.module';
 
 async function bootstrap() {
     const config = new ConfigService();
