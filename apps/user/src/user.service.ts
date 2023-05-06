@@ -34,9 +34,9 @@ export class UserService {
         console.log(opts);
         return await this.prisma.user.findMany({
             // take: opts.take.get('user'),
-            include: {
-                Token: opts,
-            },
+            // include: {
+            //     // Token: opts.include.token,
+            // },
         });
     }
 }

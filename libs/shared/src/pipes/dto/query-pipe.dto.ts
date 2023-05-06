@@ -1,21 +1,20 @@
-type Mixed = number | boolean | string;
-
-const NUM_QUERIES = ['take', 'offset'];
-const BOOLEAN_QUERIES = ['user', 'token'];
+const Include = ['user', 'token'] as const;
+const Where = ['userId', 'tokenId'] as const;
+const Options = ['take', 'offset'] as const;
 
 export class QueryDto {
-    include = {
-        token: false,
-        user: false,
+    public map = {
+        include: new Map<string, boolean>(),
+        where: new Map<string, string | number | boolean>(),
+        options: new Map<string, any>(),
     };
-    where = {
-        userId: 0,
-    };
-    take = 0;
-    offset = 0;
+
+    public include = { user: false, token: false };
+    public where = { userId: 0, tokenId: 0 };
+    public options = { take: 10, offset: 0 };
 
     constructor(defaults: any) {
-        typeof defaults === 'object' ? this.itterate(defaults) : this.get(defaults);
+        this.itterate(defaults);
     }
 
     private itterate(defaults: object) {
@@ -29,29 +28,40 @@ export class QueryDto {
             const isNumber = !isNaN(num);
             const isBoolean = value === 'true' || value === 'false';
 
-            if (key === 'user' && isBoolean) {
-                this.include[key] = bool;
+            if (Include.includes(key as any) && isBoolean) {
+                this.map.include.set(key, bool);
             }
 
-            if (key === 'token' && isBoolean) {
-                this.include[key] = bool;
+            if (Where.includes(key as any)) {
+                if (isNumber) {
+                    this.map.where.set(key, num);
+                } else {
+                    this.map.where.set(key, value);
+                }
             }
 
-            if (key === 'take' && isNumber) {
-                this.take = num;
-            }
-
-            if (key === 'offset' && isNumber) {
-                this.offset = num;
-            }
-
-            if (key === 'userId' && isNumber) {
-                this.where.userId = num;
+            if (Options.includes(key as any)) {
+                if (isNumber) {
+                    this.map.options.set(key, num);
+                } else {
+                    this.map.options.set(key, value);
+                }
             }
         }
+
+        const { include, options, where, mapToObject } = this;
+
+        this.include = mapToObject(this.map.include) as typeof include;
+        this.where = mapToObject(this.map.where) as typeof where;
+        this.options = mapToObject(this.map.options) as typeof options;
     }
 
-    private get(defaults: any) {
-        return defaults;
+    mapToObject(array: Map<string, any>) {
+        const queries = {};
+
+        for (const [key, value] of array) {
+            queries[key] = value;
+        }
+        return queries;
     }
 }
