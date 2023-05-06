@@ -1,20 +1,19 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { Public } from '@shared/decorators';
+import { AuthServiceController, LoginEmail, RegisterEmail } from '@webmogilevtsev/messenger-api-dto';
 import { AuthService } from './services/auth.service';
 
-@Public()
 @Controller()
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @MessagePattern({ cmd: 'login' })
-    login(loginUserDto) {
+    @MessagePattern(AuthServiceController.LoginEmailMessagePattern)
+    login(loginUserDto: LoginEmail.RequestBody) {
         return this.authService.login(loginUserDto);
     }
 
-    @MessagePattern({ cmd: 'register-email' })
-    regiaterEmail(registerUserDto) {
+    @MessagePattern(AuthServiceController.RegisterEmailMessagePattern)
+    regiaterEmail(registerUserDto: RegisterEmail.RequestBody) {
         return this.authService.register(registerUserDto);
     }
 }

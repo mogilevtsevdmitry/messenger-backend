@@ -1,14 +1,15 @@
 import { Body, Controller, HttpException, HttpStatus, Inject, Post, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '@shared/decorators';
 import { Response } from 'express';
 import { catchError, of, tap } from 'rxjs';
 import { LoginUserDto, RegisterWithEmailUserDto, RegisterWithPhoneUserDto } from './dto';
+import { ControllerAuth, LoginEmail, LoginEmailDto } from '@webmogilevtsev/messenger-api-dto';
 
 @Public()
 @ApiTags('Auth')
-@Controller('auth')
+@Controller(ControllerAuth.path)
 export class AuthController {
     constructor(@Inject('AUTH_SERVICE') private client: ClientProxy) {}
 
@@ -16,9 +17,10 @@ export class AuthController {
         summary: 'Аутентификация',
         description: 'Вход через email и пароль',
     })
-    @ApiBody({ type: LoginUserDto })
-    @Post('login')
-    async login(@Body() data: LoginUserDto, @Res() res: Response) {
+    @ApiBody({ type: LoginEmailDto })
+    @ApiOkResponse({ type:  })
+    @Post(LoginEmail.urlPath)
+    async login(@Body() data: LoginEmailDto, @Res() res: Response) {
         return this.client.send({ cmd: 'login' }, data).pipe(
             tap((tokens) => {
                 res.cookie('refreshtoken', tokens.refreshToken, {

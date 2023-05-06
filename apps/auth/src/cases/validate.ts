@@ -1,12 +1,8 @@
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, map, of } from 'rxjs';
 
-export const validate = (userId: string, config: ConfigService, client: ClientProxy, testUser: any) => {
-    if (config.get('NODE_ENV') !== 'production') {
-        return of(testUser);
-    }
+export const validate = (userId: string, client: ClientProxy) => {
     return client.send({ cmd: 'get-user-by-id' }, { userId }).pipe(
         map((user) => {
             if (!user) {
