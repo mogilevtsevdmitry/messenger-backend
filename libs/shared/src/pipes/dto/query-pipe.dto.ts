@@ -1,17 +1,20 @@
 const Include = ['user', 'token'] as const;
-const Where = ['userId', 'tokenId'] as const;
-const Options = ['take', 'offset'] as const;
+const Where = ['userId', 'tokenId', 'email'] as const;
+const Options = ['take', 'skip'] as const;
 
 export class QueryDto {
-    public map = {
-        include: new Map<string, boolean>(),
-        where: new Map<string, string | number | boolean>(),
-        options: new Map<string, any>(),
-    };
-
     public include = { user: false, token: false };
-    public where = { userId: 0, tokenId: 0 };
-    public options = { take: 10, offset: 0 };
+    public where = {
+        id: undefined,
+        user: undefined,
+        token: undefined,
+        email: undefined,
+        nickname: undefined,
+        sex: undefined,
+        lastName: undefined,
+        firstName: undefined,
+    };
+    public options = { take: 10, skip: 0 };
 
     constructor(defaults: any) {
         this.itterate(defaults);
@@ -29,39 +32,23 @@ export class QueryDto {
             const isBoolean = value === 'true' || value === 'false';
 
             if (Include.includes(key as any) && isBoolean) {
-                this.map.include.set(key, bool);
+                this.include[key] = bool;
             }
 
             if (Where.includes(key as any)) {
-                if (isNumber) {
-                    this.map.where.set(key, num);
-                } else {
-                    this.map.where.set(key, value);
-                }
+                isNumber ? (this.where[key] = num) : (this.where[key] = value);
             }
 
-            if (Options.includes(key as any)) {
-                if (isNumber) {
-                    this.map.options.set(key, num);
-                } else {
-                    this.map.options.set(key, value);
-                }
+            if (Options.includes(key as any) && isNumber) {
+                this.options[key] = num;
             }
         }
 
-        const { include, options, where, mapToObject } = this;
+        let {
+            options: { take, skip },
+        } = this;
 
-        this.include = mapToObject(this.map.include) as typeof include;
-        this.where = mapToObject(this.map.where) as typeof where;
-        this.options = mapToObject(this.map.options) as typeof options;
-    }
-
-    mapToObject(array: Map<string, any>) {
-        const queries = {};
-
-        for (const [key, value] of array) {
-            queries[key] = value;
-        }
-        return queries;
+        skip *= take;
+        take > 10 ? (take = 10) : take;
     }
 }

@@ -2,8 +2,8 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { UserModule } from './user.module';
 import { QueryPipe } from '@shared/pipes';
+import { UserModule } from './user.module';
 
 async function bootstrap() {
     const config = new ConfigService();
@@ -15,7 +15,6 @@ async function bootstrap() {
             host: 'localhost',
         },
     });
-    app.useGlobalPipes(new QueryPipe());
 
     await app.listen().then(() => {
         Logger.log(`UserMicroservice started on "${port}"`, 'USER');
