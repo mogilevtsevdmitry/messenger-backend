@@ -11,11 +11,11 @@ async function bootstrap() {
         transport: Transport.TCP,
         options: {
             port: +port,
-            host: 'localhost',
+            host: config.get('USER_SERVICE_HOST', 'localhost'),
         },
     });
     await app.listen().then(() => {
-        Logger.log(`UserMicroservice started on "${port}"`, 'USER');
+        Logger.log(`UserMicroservice started on "${port}"`, 'USER_SERVICE');
     });
 }
 bootstrap();
