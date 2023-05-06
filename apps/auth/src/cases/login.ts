@@ -1,11 +1,16 @@
 import { AuthHelper } from '@auth-app/services/auth.helper';
 import { TokenService } from '@auth-app/services/token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { LoginWithEmailDto } from '@webmogilevtsev/messenger-api-dto';
-import { mergeMap, of, tap } from 'rxjs';
+import { Tokens } from '@shared/interfaces';
+import { LoginWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
+import { Observable, mergeMap, of, tap } from 'rxjs';
 
-export const login = (loginUserDto: LoginWithEmailDto, client: ClientProxy, tokenService: TokenService) => {
-    return client.send({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
+export const login = (
+    loginUserDto: LoginWithEmailDto,
+    client: ClientProxy,
+    tokenService: TokenService,
+): Observable<Tokens> => {
+    return client.send<User>({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                 throw new RpcException('Не верный email или пароль');

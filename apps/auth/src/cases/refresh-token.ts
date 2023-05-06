@@ -1,15 +1,17 @@
 import { TokenService } from '@auth-app/services/token.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
-import { mergeMap } from 'rxjs';
+import { Tokens } from '@shared/interfaces';
+import { User } from '@webmogilevtsev/messenger-api-dto';
+import { mergeMap, Observable } from 'rxjs';
 
 export const refreshTokens = (
     userId: string,
     client: ClientProxy,
     prisma: PrismaService,
     tokenService: TokenService,
-) => {
-    return client.send({ cmd: 'get-user-by-id' }, { userId }).pipe(
+): Observable<Tokens> => {
+    return client.send<User>({ cmd: 'get-user-by-id' }, { userId }).pipe(
         mergeMap(async (user) => {
             const token = await prisma.token.findFirst({ where: { userId: user.id } });
             if (!token || new Date(token.exp) <= new Date()) {

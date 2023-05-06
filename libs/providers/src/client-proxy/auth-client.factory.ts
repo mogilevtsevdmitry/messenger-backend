@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
 import { AuthServiceContract } from '@webmogilevtsev/messenger-api-dto';
 
-const authClientProvider = (config: ConfigService): ClientProvider => {
+export const authClientProvider = (config: ConfigService): ClientProvider => {
     return {
         transport: Transport.TCP,
         options: {

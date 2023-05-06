@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
 
-const userClientProvider = (config: ConfigService): ClientProvider => {
+export const userClientProvider = (config: ConfigService): ClientProvider => {
     return {
         transport: Transport.TCP,
         options: {

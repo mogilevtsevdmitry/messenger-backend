@@ -8,12 +8,12 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @MessagePattern(AuthServiceController.LoginWithEmailMessagePattern)
-    login(loginUserDto: AuthServiceController.LoginWithEmailRequest) {
+    loginWithEmail(loginUserDto: AuthServiceController.LoginWithEmailRequest) {
         return this.authService.login(loginUserDto);
     }
 
     @MessagePattern(AuthServiceController.RegisterWithEmailMessagePattern)
-    regiaterEmail(registerUserDto: AuthServiceController.RegisterWithEmailRequest) {
+    registerWithEmail(registerUserDto: AuthServiceController.RegisterWithEmailRequest) {
         return this.authService.register(registerUserDto);
     }
 
