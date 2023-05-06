@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
-import { LoginEmail, RegisterEmail } from '@webmogilevtsev/messenger-api-dto';
+import { LoginWithEmailDto, RegisterWithEmailDto } from '@webmogilevtsev/messenger-api-dto';
 import { login, refreshTokens, register, validate } from '../cases';
 import { TokenService } from './token.service';
 
@@ -17,11 +17,11 @@ export class AuthService {
         return validate(userId, this.client);
     }
 
-    login(loginUserDto: LoginEmail.RequestBody) {
+    login(loginUserDto: LoginWithEmailDto) {
         return login(loginUserDto, this.client, this.tokenService);
     }
 
-    register(registerUserDto: RegisterEmail.RequestBody) {
+    register(registerUserDto: RegisterWithEmailDto) {
         return register(registerUserDto, this.client);
     }
 

@@ -1,8 +1,8 @@
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { RegisterEmail } from '@webmogilevtsev/messenger-api-dto';
+import { RegisterWithEmailDto } from '@webmogilevtsev/messenger-api-dto';
 import { catchError, map, mergeMap, tap } from 'rxjs';
 
-export const register = (registerUserDto: RegisterEmail.RequestBody, client: ClientProxy) => {
+export const register = (registerUserDto: RegisterWithEmailDto, client: ClientProxy) => {
     return client.send({ cmd: 'get-user-by-email' }, { email: registerUserDto.email }).pipe(
         tap((user) => {
             if (user) {

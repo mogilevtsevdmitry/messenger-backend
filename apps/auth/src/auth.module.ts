@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
-import { ProvidersModule } from '@providers';
+import { ProvidersModule, userClientFactory } from '@providers';
 import { SharedModule } from '@shared';
 import { AuthController } from './auth.controller';
 import { jwtModuleAsyncOptions } from './config';
@@ -15,9 +15,7 @@ import { JwtStrategy } from './strategies';
         SharedModule,
         PassportModule,
         JwtModule.registerAsync(jwtModuleAsyncOptions()),
-        ClientsModule.register([
-            { name: 'USER_SERVICE', transport: Transport.TCP, options: { port: 5002, host: 'localhost' } },
-        ]),
+        ClientsModule.registerAsync([...userClientFactory()]),
         ProvidersModule,
     ],
     providers: [AuthService, JwtStrategy, TokenService],
