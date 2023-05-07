@@ -38,3 +38,4 @@ lerna-debug.log*
 .vscode
 Messenger Backend.txt
 messenger_server*
+ngrok.exe

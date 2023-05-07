@@ -1,61 +1,55 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     HttpException,
     HttpStatus,
     Inject,
     Post,
-    Req,
     Res,
     UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Public } from '@shared/decorators';
+import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Cookies, Public } from '@shared/decorators';
 import { Tokens } from '@shared/interfaces';
 import {
     AuthContract,
     AuthServiceContract,
     AuthServiceController,
     LoginWithEmail,
+    LoginWithEmailDto,
     RefreshTokens,
     RegisterWithEmail,
 } from '@webmogilevtsev/messenger-api-dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { catchError, map, of, tap } from 'rxjs';
 
+const REFRESH_TOKEN = 'refreshtoken';
+
+@Public()
 @ApiTags(AuthContract.tag)
 @Controller(AuthContract.path)
 export class AuthController {
-    constructor(@Inject(AuthServiceContract.name) private client: ClientProxy) {}
+    constructor(
+        @Inject(AuthServiceContract.name) private client: ClientProxy,
+        private readonly configService: ConfigService,
+    ) {}
 
     @ApiOperation({
         summary: 'Аутентификация',
         description: 'Вход через email и пароль',
     })
-    @ApiBody({ type: LoginWithEmail.Request })
     @ApiOkResponse({ type: LoginWithEmail.Response })
-    @Public()
     @Post(LoginWithEmail.methodPath)
-    async login(@Body() data: LoginWithEmail.Request, @Res() res: Response) {
+    async loginWithEmail(@Body() data: LoginWithEmailDto, @Res() res: Response) {
         return this.client
             .send<Tokens, LoginWithEmail.Request>(AuthServiceController.LoginWithEmailMessagePattern, data)
             .pipe(
-                tap((tokens) => {
-                    res.cookie('refreshtoken', tokens.refreshToken, {
-                        httpOnly: true,
-                        secure: true,
-                        maxAge: new Date(tokens.refreshToken.exp).getMilliseconds(),
-                    });
-                    res.send({
-                        accessToken: tokens.accessToken,
-                    });
-                }),
+                tap((tokens) => this._setResponseWithTokens(tokens, res)),
                 catchError((err) => {
-                    res.send({
-                        statusCode: HttpStatus.BAD_REQUEST,
-                        message: err,
-                    }).status(HttpStatus.BAD_REQUEST);
+                    new BadRequestException(err.message);
                     return of(null);
                 }),
             );
@@ -67,7 +61,6 @@ export class AuthController {
     })
     @ApiBody({ type: RegisterWithEmail.Request })
     @ApiOkResponse({ type: RegisterWithEmail.Response })
-    @Public()
     @Post(RegisterWithEmail.methodPath)
     async registerByEmail(@Body() data: RegisterWithEmail.Request) {
         return this.client
@@ -83,23 +76,24 @@ export class AuthController {
             );
     }
 
+    @ApiBearerAuth()
     @ApiOperation({
         summary: 'Обновление токенов',
         description: 'Обновление пары токенов',
     })
     @ApiOkResponse({ type: RefreshTokens.Response })
     @Post(RefreshTokens.methodPath)
-    refreshTokens(@Req() req: Request) {
-        const refreshToken = req['refreshToken'];
+    refreshTokens(@Cookies(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
         if (!refreshToken) {
-            return new UnauthorizedException();
+            throw new UnauthorizedException();
         }
         return this.client
-            .send<RefreshTokens.Response, RefreshTokens.Request>(
+            .send<Tokens, RefreshTokens.Request>(
                 AuthServiceContract.AuthController.RefreshTokensMessagePattern,
-                { refreshToken },
+                refreshToken,
             )
             .pipe(
+                tap((tokens) => this._setResponseWithTokens(tokens, res)),
                 catchError((err) => {
                     throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
                 }),
@@ -116,4 +110,17 @@ export class AuthController {
     // async registerByPhone(@Body() data: RegisterWithPhoneUserDto) {
     //     return this.client.send({ cmd: 'register-phone' }, data);
     // }
+
+    private _setResponseWithTokens(tokens: Tokens, res: Response): void {
+        if (!tokens) {
+            throw new UnauthorizedException();
+        }
+        res.cookie(REFRESH_TOKEN, tokens.refreshToken.token, {
+            httpOnly: true,
+            sameSite: 'strict',
+            expires: new Date(tokens.refreshToken.exp),
+            secure: this.configService.get('NODE_ENV') === 'production',
+        });
+        res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
+    }
 }

@@ -5,7 +5,7 @@ import { UserPayload } from '@shared/decorators';
 import { Tokens } from '@shared/interfaces';
 import { LoginWithEmailDto, RegisterWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
 import { Observable } from 'rxjs';
-import { login, refreshTokens, register, validate } from '../cases';
+import { loginWithEmail, refreshTokens, register, validate } from '../cases';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -20,15 +20,15 @@ export class AuthService {
         return validate(userId, this.client);
     }
 
-    login(loginUserDto: LoginWithEmailDto): Observable<Tokens> {
-        return login(loginUserDto, this.client, this.tokenService);
+    loginWithEmail(loginUserDto: LoginWithEmailDto): Observable<Tokens> {
+        return loginWithEmail(loginUserDto, this.client, this.tokenService, this.prisma);
     }
 
     register(registerUserDto: RegisterWithEmailDto): Observable<User | unknown> {
         return register(registerUserDto, this.client);
     }
 
-    refreshTokens(userId: string): Observable<Tokens> {
-        return refreshTokens(userId, this.client, this.prisma, this.tokenService);
+    refreshTokens(refreshToken: string): Observable<Tokens> {
+        return refreshTokens(refreshToken, this.client, this.prisma, this.tokenService);
     }
 }

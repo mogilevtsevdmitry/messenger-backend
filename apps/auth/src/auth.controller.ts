@@ -9,7 +9,7 @@ export class AuthController {
 
     @MessagePattern(AuthServiceController.LoginWithEmailMessagePattern)
     loginWithEmail(loginUserDto: AuthServiceController.LoginWithEmailRequest) {
-        return this.authService.login(loginUserDto);
+        return this.authService.loginWithEmail(loginUserDto);
     }
 
     @MessagePattern(AuthServiceController.RegisterWithEmailMessagePattern)
@@ -18,7 +18,7 @@ export class AuthController {
     }
 
     @MessagePattern(AuthServiceController.RefreshTokensMessagePattern)
-    refreshToken(userId: string) {
-        return this.authService.refreshTokens(userId);
+    refreshToken(refreshToken: string) {
+        return this.authService.refreshTokens(refreshToken);
     }
 }

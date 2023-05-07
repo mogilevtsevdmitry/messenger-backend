@@ -12,17 +12,18 @@ model User {
   email     String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
-  nickname  String?
-  firstName String?
-  lastName  String?
+  nickname  String
+  firstName String
+  lastName  String
   birthday  DateTime?
   sex       String?
   photo     String[]
   phone     Int?
-  status    String?
+  status    String
   aboutMe   String?
+  token     Token[]
+  roles     String[]
   password  String
-  Token     Token[]
 
   @@map("users")
 }

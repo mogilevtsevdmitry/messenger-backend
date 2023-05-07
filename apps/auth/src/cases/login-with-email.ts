@@ -1,14 +1,16 @@
 import { AuthHelper } from '@auth-app/services/auth.helper';
 import { TokenService } from '@auth-app/services/token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
 import { LoginWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
-import { Observable, mergeMap, of, tap } from 'rxjs';
+import { Observable, mergeMap, tap } from 'rxjs';
 
-export const login = (
+export const loginWithEmail = (
     loginUserDto: LoginWithEmailDto,
     client: ClientProxy,
     tokenService: TokenService,
+    prisma: PrismaService,
 ): Observable<Tokens> => {
     return client.send<User>({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
         tap((user) => {
@@ -16,14 +18,15 @@ export const login = (
                 throw new RpcException('Не верный email или пароль');
             }
         }),
-        mergeMap((user) => {
+        mergeMap(async (user) => {
             const accessToken = tokenService.accessToken({
                 userId: user.id,
                 email: user.email,
                 roles: user.roles,
             });
             const refreshToken = tokenService.refreshToken();
-            return of({ accessToken, refreshToken });
+            await prisma.token.create({ data: { ...refreshToken, userId: user.id } });
+            return { accessToken, refreshToken };
         }),
     );
 };

@@ -1,34 +1,48 @@
 import { TokenService } from '@auth-app/services/token.service';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
 import { User } from '@webmogilevtsev/messenger-api-dto';
-import { mergeMap, Observable } from 'rxjs';
+import { catchError, from, map, mergeMap, Observable, of } from 'rxjs';
 
 export const refreshTokens = (
-    userId: string,
+    _refreshToken: string,
     client: ClientProxy,
     prisma: PrismaService,
     tokenService: TokenService,
-): Observable<Tokens> => {
-    return client.send<User>({ cmd: 'get-user-by-id' }, { userId }).pipe(
-        mergeMap(async (user) => {
-            const token = await prisma.token.findFirst({ where: { userId: user.id } });
+): Observable<Tokens | null> => {
+    return from(prisma.token.findUnique({ where: { token: _refreshToken } })).pipe(
+        map((token) => {
             if (!token || new Date(token.exp) <= new Date()) {
-                return null;
+                throw new Error('Токен не найден или истек срок действия');
             }
-            const refreshToken = tokenService.refreshToken();
-            const accessToken = tokenService.accessToken({
-                email: user.email,
-                userId: user.id,
-                roles: user.roles,
-            });
-            await prisma.token.delete({ where: { token: token.token } });
-            await prisma.token.create({ data: { ...refreshToken, userId } });
-            return {
-                accessToken,
-                refreshToken,
-            };
+            return token;
+        }),
+        mergeMap((token) =>
+            client.send<User>({ cmd: 'get-user-by-id' }, { userId: token.userId }).pipe(
+                mergeMap(async (user) => {
+                    if (!user) {
+                        throw new NotFoundException(`Пользователь с id ${token.userId} не найден`);
+                    }
+                    const refreshToken = tokenService.refreshToken();
+                    const accessToken = tokenService.accessToken({
+                        email: user.email,
+                        userId: user.id,
+                        roles: user.roles,
+                    });
+                    await prisma.token.delete({ where: { token: token.token } });
+                    await prisma.token.create({ data: { ...refreshToken, userId: user.id } });
+                    return {
+                        accessToken,
+                        refreshToken,
+                    };
+                }),
+            ),
+        ),
+        catchError((err) => {
+            Logger.error(err.message);
+            return of(null);
         }),
     );
 };
