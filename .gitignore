@@ -40,3 +40,4 @@ workspace.code-workspace
 Messenger Backend.txt
 messenger_server*
 ngrok.exe
+deploy.bat

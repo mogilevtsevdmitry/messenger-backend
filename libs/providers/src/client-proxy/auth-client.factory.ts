@@ -1,6 +1,5 @@
 import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
-import { AuthServiceContract } from '@webmogilevtsev/messenger-api-dto';
 
 export const authClientProvider = (config: ConfigService): ClientProvider => {
     return {
@@ -15,7 +14,7 @@ export const authClientProvider = (config: ConfigService): ClientProvider => {
 export const authClientFactory = (): ClientsModuleAsyncOptions => {
     return [
         {
-            name: AuthServiceContract.name,
+            name: 'AUTH_SERVICE',
             inject: [ConfigService],
             useFactory: (config: ConfigService) => authClientProvider(config),
         },

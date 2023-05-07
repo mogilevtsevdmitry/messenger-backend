@@ -1,16 +1,15 @@
 import { ClientProxy, RpcException } from '@nestjs/microservices';
-import { RegisterWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
 import { Observable, catchError, map, mergeMap, tap } from 'rxjs';
 
-export const register = (registerUserDto: RegisterWithEmailDto, client: ClientProxy): Observable<User | unknown> => {
-    return client.send<User>({ cmd: 'find-by-email' }, registerUserDto.email).pipe(
+export const register = (registerUserDto, client: ClientProxy): Observable<unknown> => {
+    return client.send({ cmd: 'find-by-email' }, registerUserDto.email).pipe(
         tap((user) => {
             if (user) {
                 throw new RpcException(`Пользователь с email "${registerUserDto.email}" уже существует`);
             }
         }),
         mergeMap(() =>
-            client.send<User>({ cmd: 'create-user' }, registerUserDto).pipe(
+            client.send({ cmd: 'create-user' }, registerUserDto).pipe(
                 map((_user) => {
                     if (!_user) {
                         throw new RpcException(

@@ -11,69 +11,51 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Cookies, Public } from '@shared/decorators';
 import { Tokens } from '@shared/interfaces';
-import {
-    AuthContract,
-    AuthServiceContract,
-    AuthServiceController,
-    LoginWithEmail,
-    LoginWithEmailDto,
-    RefreshTokens,
-    RegisterWithEmail,
-} from '@webmogilevtsev/messenger-api-dto';
 import { Response } from 'express';
 import { catchError, map, of, tap } from 'rxjs';
+import { LoginWithEmailDto, RegisterWithEmailDto } from './dto';
+import { LoginResponse, RegisterResponse } from './responses';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
 @Public()
-@ApiTags(AuthContract.tag)
-@Controller(AuthContract.path)
+@ApiTags('Auth')
+@Controller('auth')
 export class AuthController {
-    constructor(
-        @Inject(AuthServiceContract.name) private client: ClientProxy,
-        private readonly configService: ConfigService,
-    ) {}
+    constructor(@Inject('AUTH_SERVICE') private client: ClientProxy, private readonly configService: ConfigService) {}
 
     @ApiOperation({
         summary: 'Аутентификация',
         description: 'Вход через email и пароль',
     })
-    @ApiOkResponse({ type: LoginWithEmail.Response })
-    @Post(LoginWithEmail.methodPath)
+    @ApiOkResponse({ type: LoginResponse })
+    @Post('login/email')
     async loginWithEmail(@Body() data: LoginWithEmailDto, @Res() res: Response) {
-        return this.client
-            .send<Tokens, LoginWithEmail.Request>(AuthServiceController.LoginWithEmailMessagePattern, data)
-            .pipe(
-                tap((tokens) => this._setResponseWithTokens(tokens, res)),
-                catchError((err) => {
-                    new BadRequestException(err.message);
-                    return of(null);
-                }),
-            );
+        return this.client.send<Tokens>({ cmd: 'login/email' }, data).pipe(
+            tap((tokens) => this._setResponseWithTokens(tokens, res)),
+            catchError((err) => {
+                new BadRequestException(err.message);
+                return of(null);
+            }),
+        );
     }
 
     @ApiOperation({
         summary: 'Регистрация email',
         description: 'Регистрация с помощью email и пароля',
     })
-    @ApiBody({ type: RegisterWithEmail.Request })
-    @ApiOkResponse({ type: RegisterWithEmail.Response })
-    @Post(RegisterWithEmail.methodPath)
-    async registerByEmail(@Body() data: RegisterWithEmail.Request) {
-        return this.client
-            .send<RegisterWithEmail.Response, RegisterWithEmail.Request>(
-                AuthServiceContract.AuthController.RegisterWithEmailMessagePattern,
-                data,
-            )
-            .pipe(
-                map((user) => !!user),
-                catchError((err) => {
-                    throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
-                }),
-            );
+    @ApiOkResponse({ type: RegisterResponse })
+    @Post('register/email')
+    async registerByEmail(@Body() data: RegisterWithEmailDto) {
+        return this.client.send({ cmd: 'register/email' }, data).pipe(
+            map((user) => !!user),
+            catchError((err) => {
+                throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
+            }),
+        );
     }
 
     @ApiBearerAuth()
@@ -81,23 +63,18 @@ export class AuthController {
         summary: 'Обновление токенов',
         description: 'Обновление пары токенов',
     })
-    @ApiOkResponse({ type: RefreshTokens.Response })
-    @Post(RefreshTokens.methodPath)
+    @ApiOkResponse({ type: LoginResponse })
+    @Post('refresh-tokens')
     refreshTokens(@Cookies(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
         if (!refreshToken) {
             throw new UnauthorizedException();
         }
-        return this.client
-            .send<Tokens, RefreshTokens.Request>(
-                AuthServiceContract.AuthController.RefreshTokensMessagePattern,
-                refreshToken,
-            )
-            .pipe(
-                tap((tokens) => this._setResponseWithTokens(tokens, res)),
-                catchError((err) => {
-                    throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
-                }),
-            );
+        return this.client.send<Tokens>({ cmd: 'refresh-tokens' }, refreshToken).pipe(
+            tap((tokens) => this._setResponseWithTokens(tokens, res)),
+            catchError((err) => {
+                throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
+            }),
+        );
     }
 
     // @ApiOperation({
