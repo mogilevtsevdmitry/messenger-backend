@@ -3,9 +3,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { SharedModule } from '@shared';
 import { JwtGuard, RolesGuard } from '@shared/guards';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-    imports: [SharedModule, AuthModule],
+    imports: [SharedModule, AuthModule, UserModule],
     providers: [
         {
             provide: APP_GUARD,

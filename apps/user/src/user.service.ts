@@ -1,25 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
+import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
 import { genSalt, hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async findUserByEmail(findUserByEmailDto: any) {
-        return this.prisma.user.findFirst({ where: { email: findUserByEmailDto.email } });
-    }
+    async create(data: { email: string; password: string }) {
+        const hashedPassword = await hash(data.password, await genSalt(10));
 
-    async findUserById(userId: string) {
-        return this.prisma.user.findFirst({ where: { id: userId } });
-    }
-
-    async createUser(createUserDto: { email: string; password: string }) {
-        const salt = await genSalt(10);
-        const hashedPassword = await hash(createUserDto.password, salt);
-        const user = await this.prisma.user.upsert({
-            create: {
-                email: createUserDto.email,
+        return await this.prisma.user.create({
+            data: {
+                email: data.email,
                 password: hashedPassword,
                 roles: [],
                 nickname: '',
@@ -27,11 +20,48 @@ export class UserService {
                 firstName: '',
                 status: '',
             },
-            where: {
-                email: createUserDto.email,
-            },
-            update: {},
         });
-        return user;
+    }
+
+    async findAll(opts?: QueryDto) {
+        const total = await this.prisma.user.aggregate({ _count: { id: true } });
+
+        return await this.prisma.user
+            .findMany({
+                skip: opts.options.skip,
+                take: opts.options.take,
+                where: {
+                    email: opts.where.email,
+                    id: opts.where.id,
+                    nickname: opts.where.nickname,
+                    lastName: opts.where.lastName,
+                    firstName: opts.where.firstName,
+                },
+                include: {
+                    token: opts.include.token,
+                },
+            })
+            .then((users) => {
+                return {
+                    total: total._count.id,
+                    raw: users,
+                };
+            });
+    }
+
+    async findOne(userId: string) {
+        return await this.prisma.user.findUnique({ where: { id: userId } });
+    }
+
+    async findByEmail(email: string) {
+        return await this.prisma.user.findFirst({ where: { email } });
+    }
+
+    async updateOne(userId: string, data: any) {
+        return await this.prisma.user.update({ data, where: { id: userId } });
+    }
+
+    async deleteOne(userId: string) {
+        return await this.prisma.user.delete({ where: { id: userId } });
     }
 }
