@@ -26,3 +26,5 @@ jobs:
       run: |
         npm install
         npm run build
+        npm run build user
+        npm run build auth
