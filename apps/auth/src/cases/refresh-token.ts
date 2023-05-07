@@ -1,6 +1,7 @@
 import { TokenService } from '@auth-app/services/token.service';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Token } from '@prisma/client';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
 import { catchError, from, map, mergeMap, Observable, of } from 'rxjs';
@@ -12,7 +13,7 @@ export const refreshTokens = (
     tokenService: TokenService,
 ): Observable<Tokens | null> => {
     return from(prisma.token.findUnique({ where: { token: _refreshToken } })).pipe(
-        map((token) => {
+        map((token: Token) => {
             if (!token || new Date(token.exp) <= new Date()) {
                 throw new Error('Токен не найден или истек срок действия');
             }
