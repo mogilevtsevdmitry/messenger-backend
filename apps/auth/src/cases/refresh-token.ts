@@ -3,7 +3,6 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
-import { User } from '@webmogilevtsev/messenger-api-dto';
 import { catchError, from, map, mergeMap, Observable, of } from 'rxjs';
 
 export const refreshTokens = (
@@ -20,7 +19,7 @@ export const refreshTokens = (
             return token;
         }),
         mergeMap((token) =>
-            client.send<User>({ cmd: 'find-user' }, token.userId).pipe(
+            client.send({ cmd: 'find-user' }, token.userId).pipe(
                 mergeMap(async (user) => {
                     if (!user) {
                         throw new NotFoundException(`Пользователь с id ${token.userId} не найден`);

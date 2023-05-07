@@ -1,8 +1,10 @@
 import { Controller, Get, Query, Inject, Patch, Delete, Body, Param, Res } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { ApiTags } from '@nestjs/swagger';
 import { QueryPipe } from '@shared/pipes';
 import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
 
+@ApiTags('User')
 @Controller('users')
 export class UserController {
     constructor(@Inject('USER_SERVICE') private client: ClientProxy) {}

@@ -3,16 +3,15 @@ import { TokenService } from '@auth-app/services/token.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
-import { LoginWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
 import { Observable, mergeMap, tap } from 'rxjs';
 
 export const loginWithEmail = (
-    loginUserDto: LoginWithEmailDto,
+    loginUserDto,
     client: ClientProxy,
     tokenService: TokenService,
     prisma: PrismaService,
 ): Observable<Tokens> => {
-    return client.send<User>({ cmd: 'find-by-email' }, loginUserDto.email).pipe(
+    return client.send({ cmd: 'find-by-email' }, loginUserDto.email).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                 throw new RpcException('Не верный email или пароль');

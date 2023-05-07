@@ -3,7 +3,6 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { UserPayload } from '@shared/decorators';
 import { Tokens } from '@shared/interfaces';
-import { LoginWithEmailDto, RegisterWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
 import { Observable } from 'rxjs';
 import { loginWithEmail, refreshTokens, register, validate } from '../cases';
 import { TokenService } from './token.service';
@@ -20,11 +19,11 @@ export class AuthService {
         return validate(userId, this.client);
     }
 
-    loginWithEmail(loginUserDto: LoginWithEmailDto): Observable<Tokens> {
+    loginWithEmail(loginUserDto): Observable<Tokens> {
         return loginWithEmail(loginUserDto, this.client, this.tokenService, this.prisma);
     }
 
-    register(registerUserDto: RegisterWithEmailDto): Observable<User | unknown> {
+    register(registerUserDto): Observable<unknown> {
         return register(registerUserDto, this.client);
     }
 
