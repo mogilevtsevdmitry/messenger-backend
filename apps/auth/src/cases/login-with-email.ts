@@ -12,7 +12,7 @@ export const loginWithEmail = (
     tokenService: TokenService,
     prisma: PrismaService,
 ): Observable<Tokens> => {
-    return client.send<User>({ cmd: 'get-user-by-email' }, { email: loginUserDto.email }).pipe(
+    return client.send<User>({ cmd: 'find-by-email' }, loginUserDto.email).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                 throw new RpcException('Не верный email или пароль');

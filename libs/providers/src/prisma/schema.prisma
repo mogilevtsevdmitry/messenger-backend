@@ -21,9 +21,9 @@ model User {
   phone     Int?
   status    String
   aboutMe   String?
-  token     Token[]
-  roles     String[]
   password  String
+  roles     String[]
+  token     Token[]
 
   @@map("users")
 }

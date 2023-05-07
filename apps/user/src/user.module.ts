@@ -9,16 +9,16 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     imports: [
         ProvidersModule,
         SharedModule,
-        ClientsModule.register([
-            {
-                name: 'AUTH_SERVICE',
-                transport: Transport.TCP,
-                options: {
-                    host: 'localhost',
-                    port: 5003,
-                },
-            },
-        ]),
+        // ClientsModule.register([
+        //     {
+        //         name: 'AUTH_SERVICE',
+        //         transport: Transport.TCP,
+        //         options: {
+        //             host: 'localhost',
+        //             port: 5003,
+        //         },
+        //     },
+        // ]),
     ],
     controllers: [UserController],
     providers: [UserService],

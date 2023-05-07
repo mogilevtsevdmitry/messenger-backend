@@ -20,7 +20,7 @@ export const refreshTokens = (
             return token;
         }),
         mergeMap((token) =>
-            client.send<User>({ cmd: 'get-user-by-id' }, { userId: token.userId }).pipe(
+            client.send<User>({ cmd: 'find-user' }, token.userId).pipe(
                 mergeMap(async (user) => {
                     if (!user) {
                         throw new NotFoundException(`Пользователь с id ${token.userId} не найден`);

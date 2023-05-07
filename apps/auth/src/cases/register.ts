@@ -3,7 +3,7 @@ import { RegisterWithEmailDto, User } from '@webmogilevtsev/messenger-api-dto';
 import { Observable, catchError, map, mergeMap, tap } from 'rxjs';
 
 export const register = (registerUserDto: RegisterWithEmailDto, client: ClientProxy): Observable<User | unknown> => {
-    return client.send<User>({ cmd: 'get-user-by-email' }, { email: registerUserDto.email }).pipe(
+    return client.send<User>({ cmd: 'find-by-email' }, registerUserDto.email).pipe(
         tap((user) => {
             if (user) {
                 throw new RpcException(`Пользователь с email "${registerUserDto.email}" уже существует`);
