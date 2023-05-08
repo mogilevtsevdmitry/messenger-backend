@@ -2,7 +2,7 @@ import { USER_SERVICE } from '@contracts/services/user';
 import { Body, Controller, Delete, Get, Inject, Param, Patch, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
-import { QueryPipe } from '@shared/pipes';
+import { ParseEmailPipe, QueryPipe } from '@shared/pipes';
 import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
 
 @ApiTags('Users')
@@ -21,7 +21,7 @@ export class UsersController {
     }
 
     @Get('email/:email')
-    async findByEmail(@Param('email') email: string) {
+    async findByEmail(@Param('email', ParseEmailPipe) email: string) {
         return this.client.send({ cmd: 'find-by-email' }, email);
     }
 
