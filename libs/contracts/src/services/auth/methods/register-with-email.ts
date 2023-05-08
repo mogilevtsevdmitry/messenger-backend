@@ -1,4 +1,4 @@
-import { User } from '@contracts/interfaces';
+import { User } from '@shared/interfaces';
 
 export namespace RegisterWithEmailNamespace {
     /** #### Команда авторизации

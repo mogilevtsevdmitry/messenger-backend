@@ -1,4 +1,4 @@
-import { LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
+import { LoginWithEmailNamespace, RefreshTokensNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AuthService } from './services/auth.service';
@@ -17,8 +17,8 @@ export class AuthController {
         return this.authService.register(registerUserDto);
     }
 
-    @MessagePattern({ cmd: 'refresh-tokens' })
-    refreshToken(refreshToken: string) {
+    @MessagePattern(RefreshTokensNamespace.MessagePattern)
+    refreshToken({ refreshToken }: RefreshTokensNamespace.Request) {
         return this.authService.refreshTokens(refreshToken);
     }
 }
