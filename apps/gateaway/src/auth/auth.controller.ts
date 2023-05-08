@@ -18,6 +18,7 @@ import { Response } from 'express';
 import { catchError, map, of, tap } from 'rxjs';
 import { LoginWithEmailDto, RegisterWithEmailDto } from './dto';
 import { LoginResponse, RegisterResponse } from './responses';
+import { AuthClient, LoginWithEmailNamespace } from '@contracts/services/auth';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -25,7 +26,7 @@ const REFRESH_TOKEN = 'refreshtoken';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(@Inject('AUTH_SERVICE') private client: ClientProxy, private readonly configService: ConfigService) {}
+    constructor(@Inject(AuthClient.Name) private client: ClientProxy, private readonly configService: ConfigService) {}
 
     @ApiOperation({
         summary: 'Аутентификация',
@@ -34,13 +35,18 @@ export class AuthController {
     @ApiOkResponse({ type: LoginResponse })
     @Post('login/email')
     async loginWithEmail(@Body() data: LoginWithEmailDto, @Res() res: Response) {
-        return this.client.send<Tokens>({ cmd: 'login/email' }, data).pipe(
-            tap((tokens) => this._setResponseWithTokens(tokens, res)),
-            catchError((err) => {
-                new BadRequestException(err.message);
-                return of(null);
-            }),
-        );
+        return this.client
+            .send<LoginWithEmailNamespace.Response, LoginWithEmailNamespace.Request>(
+                LoginWithEmailNamespace.MessagePattern,
+                data,
+            )
+            .pipe(
+                tap((tokens) => this._setResponseWithTokens(tokens, res)),
+                catchError((err) => {
+                    new BadRequestException(err.message);
+                    return of(null);
+                }),
+            );
     }
 
     @ApiOperation({
