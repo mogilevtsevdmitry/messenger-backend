@@ -1,4 +1,4 @@
-import { AuthClient } from '@contracts/services/auth';
+import { AUTH_SERVICE } from '@contracts/services/auth';
 import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
 
@@ -15,7 +15,7 @@ export const authClientProvider = (config: ConfigService): ClientProvider => {
 export const authClientFactory = (): ClientsModuleAsyncOptions => {
     return [
         {
-            name: AuthClient.Name,
+            name: AUTH_SERVICE,
             inject: [ConfigService],
             useFactory: (config: ConfigService) => authClientProvider(config),
         },

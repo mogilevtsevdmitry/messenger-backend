@@ -1,6 +1,6 @@
 import { LoginWithEmailMethod, RefreshTokensMethod, RegisterWithEmailMethod } from '@contracts/controllers/auth';
 import {
-    AuthClient,
+    AUTH_SERVICE,
     LoginWithEmailNamespace,
     RefreshTokensNamespace,
     RegisterWithEmailNamespace,
@@ -23,7 +23,7 @@ const REFRESH_TOKEN = 'refreshtoken';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(@Inject(AuthClient.Name) private client: ClientProxy, private readonly configService: ConfigService) {}
+    constructor(@Inject(AUTH_SERVICE) private client: ClientProxy, private readonly configService: ConfigService) {}
 
     @ApiOperation({
         summary: LoginWithEmailMethod.summary,

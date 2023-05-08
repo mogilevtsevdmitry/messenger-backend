@@ -1,4 +1,5 @@
 import { FindCurrentUserMethod } from '@contracts/controllers/user';
+import { USER_SERVICE } from '@contracts/services/user';
 import {
     ClassSerializerInterceptor,
     Controller,
@@ -19,7 +20,7 @@ import { UserResponse } from './respnonses/user.response';
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-    constructor(@Inject('USER_SERVICE') private readonly client: ClientProxy) {}
+    constructor(@Inject(USER_SERVICE) private readonly client: ClientProxy) {}
 
     @ApiOperation({
         summary: FindCurrentUserMethod.summary,

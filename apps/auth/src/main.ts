@@ -1,3 +1,4 @@
+import { AUTH_SERVICE } from '@contracts/services/auth';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -10,7 +11,7 @@ async function bootstrap() {
     const port = config.get<number>('AUTH_API_PORT', 5001);
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(AuthModule, authClientProvider(config));
     await app.listen().then(() => {
-        Logger.log(`AuthMicroservice started on "${port}"`, 'AUTH_SERVICE');
+        Logger.log(`AuthMicroservice started on "${port}"`, AUTH_SERVICE);
     });
 }
 bootstrap();

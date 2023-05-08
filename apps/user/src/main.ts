@@ -1,3 +1,4 @@
+import { USER_SERVICE } from '@contracts/services/user';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -10,7 +11,7 @@ async function bootstrap() {
     const port = config.get<number>('USER_API_PORT', 5002);
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(UserModule, userClientProvider(config));
     await app.listen().then(() => {
-        Logger.log(`UserMicroservice started on "${port}"`, 'USER_SERVICE');
+        Logger.log(`UserMicroservice started on "${port}"`, USER_SERVICE);
     });
 }
 bootstrap();

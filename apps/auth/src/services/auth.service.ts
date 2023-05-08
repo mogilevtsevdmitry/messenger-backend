@@ -1,3 +1,5 @@
+import { LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
+import { USER_SERVICE } from '@contracts/services/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
@@ -6,12 +8,11 @@ import { Tokens } from '@shared/interfaces';
 import { Observable } from 'rxjs';
 import { loginWithEmail, refreshTokens, register, validate } from '../cases';
 import { TokenService } from './token.service';
-import { LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
 
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject('USER_SERVICE') private client: ClientProxy,
+        @Inject(USER_SERVICE) private client: ClientProxy,
         private readonly tokenService: TokenService,
         private readonly prisma: PrismaService,
     ) {}
