@@ -14,7 +14,6 @@ export class UserService {
             data: {
                 email: data.email,
                 password: hashedPassword,
-                roles: [],
                 nickname: '',
                 lastName: '',
                 firstName: '',
