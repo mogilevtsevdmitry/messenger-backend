@@ -17,8 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     validate(payload: UserPayload) {
-        console.log({ payload });
-
         return firstValueFrom(
             this.authService.validate(payload.userId).pipe(
                 map((user) => {
