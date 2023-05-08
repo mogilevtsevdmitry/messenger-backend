@@ -1,12 +1,13 @@
 import { AuthHelper } from '@auth-app/services/auth.helper';
 import { TokenService } from '@auth-app/services/token.service';
+import { LoginWithEmailNamespace } from '@contracts/services/auth';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens } from '@shared/interfaces';
 import { Observable, mergeMap, tap } from 'rxjs';
 
 export const loginWithEmail = (
-    loginUserDto,
+    loginUserDto: LoginWithEmailNamespace.Request,
     client: ClientProxy,
     tokenService: TokenService,
     prisma: PrismaService,

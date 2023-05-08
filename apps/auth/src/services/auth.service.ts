@@ -6,6 +6,7 @@ import { Tokens } from '@shared/interfaces';
 import { Observable } from 'rxjs';
 import { loginWithEmail, refreshTokens, register, validate } from '../cases';
 import { TokenService } from './token.service';
+import { LoginWithEmailNamespace } from '@contracts/services/auth';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
         return validate(userId, this.client);
     }
 
-    loginWithEmail(loginUserDto): Observable<Tokens> {
+    loginWithEmail(loginUserDto: LoginWithEmailNamespace.Request): Observable<Tokens> {
         return loginWithEmail(loginUserDto, this.client, this.tokenService, this.prisma);
     }
 
