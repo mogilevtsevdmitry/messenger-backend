@@ -1,5 +1,4 @@
 import {
-    BadRequestException,
     ClassSerializerInterceptor,
     Controller,
     Get,
@@ -11,9 +10,9 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@shared/decorators';
-import { catchError, map } from 'rxjs';
-import { UserResponse } from './respnonses/user.response';
 import { handleTimeoutAndErrors } from '@shared/helpers';
+import { map } from 'rxjs';
+import { UserResponse } from './respnonses/user.response';
 
 @ApiTags('User')
 @ApiBearerAuth()

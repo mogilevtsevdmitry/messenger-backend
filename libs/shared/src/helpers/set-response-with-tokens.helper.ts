@@ -3,6 +3,7 @@ import { Tokens } from '@shared/interfaces';
 import { Response } from 'express';
 
 export function setResponseWithTokens(tokens: Tokens, res: Response, REFRESH_TOKEN: string): void {
+    console.log({ tokens });
     if (!tokens) {
         throw new UnauthorizedException();
     }

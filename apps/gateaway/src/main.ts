@@ -6,7 +6,6 @@ import { json } from 'body-parser';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { TimeoutInterceptor } from '@shared/interceptors';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -31,9 +30,6 @@ async function bootstrap() {
 
     /** Global validation */
     app.useGlobalPipes(new ValidationPipe());
-
-    /** Global Interceptor */
-    app.useGlobalInterceptors(new TimeoutInterceptor());
 
     // Swagger
     const swaggerConfig = new DocumentBuilder()
