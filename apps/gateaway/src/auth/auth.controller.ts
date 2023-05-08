@@ -1,9 +1,9 @@
-import { Body, Controller, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Cookies, Public } from '@shared/decorators';
-import { handleTimeoutAndErrors, setResponseWithTokens } from '@shared/helpers';
+import { handleTimeoutAndErrors } from '@shared/helpers';
 import { Tokens } from '@shared/interfaces';
 import { Response } from 'express';
 import { map, tap } from 'rxjs';
@@ -26,7 +26,7 @@ export class AuthController {
     @Post('login/email')
     async loginWithEmail(@Body() data: LoginWithEmailDto, @Res() res: Response) {
         return this.client.send<Tokens>({ cmd: 'login/email' }, data).pipe(
-            tap((tokens) => setResponseWithTokens(tokens, res, REFRESH_TOKEN)),
+            tap((tokens) => this.setResponseWithTokens(tokens, res)),
             handleTimeoutAndErrors(),
         );
     }
@@ -56,7 +56,7 @@ export class AuthController {
             throw new UnauthorizedException();
         }
         return this.client.send<Tokens>({ cmd: 'refresh-tokens' }, refreshToken).pipe(
-            tap((tokens) => setResponseWithTokens(tokens, res, REFRESH_TOKEN)),
+            tap((tokens) => this.setResponseWithTokens(tokens, res)),
             handleTimeoutAndErrors(),
         );
     }
@@ -71,4 +71,17 @@ export class AuthController {
     // async registerByPhone(@Body() data: RegisterWithPhoneUserDto) {
     //     return this.client.send({ cmd: 'register-phone' }, data);
     // }
+
+    private setResponseWithTokens(tokens: Tokens, res: Response): void {
+        if (!tokens) {
+            throw new UnauthorizedException();
+        }
+        res.cookie(REFRESH_TOKEN, tokens.refreshToken.token, {
+            httpOnly: true,
+            sameSite: 'strict',
+            expires: new Date(tokens.refreshToken.exp),
+            secure: this.configService.get('NODE_ENV') === 'production',
+        });
+        res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
+    }
 }
