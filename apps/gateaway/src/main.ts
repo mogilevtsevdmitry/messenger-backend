@@ -31,6 +31,7 @@ async function bootstrap() {
         .setTitle('Noname Messenger')
         .setDescription('## API простого мессенджера')
         .setVersion('1.0')
+        .addServer(`https://unknown-messenger.ru/`, 'DEV server')
         .addServer(`http://localhost:${port}/`, 'local server')
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
