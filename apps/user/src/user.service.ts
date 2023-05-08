@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
-import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
+import { QueryDto } from '@shared/pipes';
 import { genSalt, hash } from 'bcrypt';
 
 @Injectable()
@@ -44,6 +44,8 @@ export class UserService {
                 return {
                     total: total._count.id,
                     raw: users,
+                    take: opts.options.take || users.length,
+                    skip: opts.options.skip || 0,
                 };
             });
     }
