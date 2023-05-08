@@ -3,4 +3,6 @@ export interface RefreshToken {
     token: string;
     /** Дата истечения срока действия токена */
     exp: Date;
+    /** Идентификатор пользователя */
+    userId?: string;
 }

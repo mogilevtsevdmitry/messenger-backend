@@ -1,6 +1,6 @@
-import { User } from '@contracts/interfaces';
 import { RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { User } from '@shared/interfaces';
 import { Observable, catchError, map, mergeMap, tap } from 'rxjs';
 
 export const register = (
