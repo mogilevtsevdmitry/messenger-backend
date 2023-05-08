@@ -1,3 +1,5 @@
+import { FindCurrentUserMethod } from '@contracts/controllers/user';
+import { USER_SERVICE } from '@contracts/services/user';
 import {
     ClassSerializerInterceptor,
     Controller,
@@ -18,17 +20,17 @@ import { UserResponse } from './respnonses/user.response';
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-    constructor(@Inject('USER_SERVICE') private readonly client: ClientProxy) {}
+    constructor(@Inject(USER_SERVICE) private readonly client: ClientProxy) {}
 
     @ApiOperation({
-        summary: 'Получение данных пользователя',
-        description: 'Получение данных авторизованного пользователя',
+        summary: FindCurrentUserMethod.summary,
+        description: FindCurrentUserMethod.description,
     })
     @ApiOkResponse({
         type: UserResponse,
     })
     @UseInterceptors(ClassSerializerInterceptor)
-    @Get()
+    @Get(FindCurrentUserMethod.path)
     getCurrentUser(@CurrentUser('userId', ParseUUIDPipe) userId: string) {
         return this.client.send({ cmd: 'find-user' }, userId).pipe(
             map((user) => {

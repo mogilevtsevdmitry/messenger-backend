@@ -1,3 +1,10 @@
+import { LoginWithEmailMethod, RefreshTokensMethod, RegisterWithEmailMethod } from '@contracts/controllers/auth';
+import {
+    AUTH_SERVICE,
+    LoginWithEmailNamespace,
+    RefreshTokensNamespace,
+    RegisterWithEmailNamespace,
+} from '@contracts/services/auth';
 import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
@@ -16,49 +23,64 @@ const REFRESH_TOKEN = 'refreshtoken';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(@Inject('AUTH_SERVICE') private client: ClientProxy, private readonly configService: ConfigService) {}
+    constructor(@Inject(AUTH_SERVICE) private client: ClientProxy, private readonly configService: ConfigService) {}
 
     @ApiOperation({
-        summary: 'Аутентификация',
-        description: 'Вход через email и пароль',
+        summary: LoginWithEmailMethod.summary,
+        description: LoginWithEmailMethod.description,
     })
     @ApiOkResponse({ type: LoginResponse })
-    @Post('login/email')
+    @Post(LoginWithEmailMethod.path)
     async loginWithEmail(@Body() data: LoginWithEmailDto, @Res() res: Response) {
-        return this.client.send<Tokens>({ cmd: 'login/email' }, data).pipe(
-            tap((tokens) => this.setResponseWithTokens(tokens, res)),
-            handleTimeoutAndErrors(),
-        );
+        return this.client
+            .send<LoginWithEmailNamespace.Response, LoginWithEmailNamespace.Request>(
+                LoginWithEmailNamespace.MessagePattern,
+                data,
+            )
+            .pipe(
+                tap((tokens) => this.setResponseWithTokens(tokens, res)),
+                handleTimeoutAndErrors(),
+            );
     }
 
     @ApiOperation({
-        summary: 'Регистрация email',
-        description: 'Регистрация с помощью email и пароля',
+        summary: RegisterWithEmailMethod.summary,
+        description: RegisterWithEmailMethod.description,
     })
     @ApiOkResponse({ type: RegisterResponse })
-    @Post('register/email')
+    @Post(RegisterWithEmailMethod.path)
     async registerByEmail(@Body() data: RegisterWithEmailDto) {
-        return this.client.send({ cmd: 'register/email' }, data).pipe(
-            map((user) => !!user),
-            handleTimeoutAndErrors(),
-        );
+        return this.client
+            .send<RegisterWithEmailNamespace.Response, RegisterWithEmailNamespace.Request>(
+                RegisterWithEmailNamespace.MessagePattern,
+                data,
+            )
+            .pipe(
+                map((user) => !!user),
+                handleTimeoutAndErrors(),
+            );
     }
 
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Обновление токенов',
-        description: 'Обновление пары токенов',
+        summary: RefreshTokensMethod.summary,
+        description: RefreshTokensMethod.description,
     })
     @ApiOkResponse({ type: LoginResponse })
-    @Post('refresh-tokens')
+    @Post(RefreshTokensMethod.path)
     refreshTokens(@Cookies(REFRESH_TOKEN) refreshToken: string, @Res() res: Response) {
         if (!refreshToken) {
             throw new UnauthorizedException();
         }
-        return this.client.send<Tokens>({ cmd: 'refresh-tokens' }, refreshToken).pipe(
-            tap((tokens) => this.setResponseWithTokens(tokens, res)),
-            handleTimeoutAndErrors(),
-        );
+        return this.client
+            .send<RefreshTokensNamespace.Response, RefreshTokensNamespace.Request>(
+                RefreshTokensNamespace.MessagePattern,
+                { refreshToken },
+            )
+            .pipe(
+                tap((tokens) => this.setResponseWithTokens(tokens, res)),
+                handleTimeoutAndErrors(),
+            );
     }
 
     // @ApiOperation({

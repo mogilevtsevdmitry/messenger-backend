@@ -1,9 +1,4 @@
-export interface RefreshToken {
-    /** Токен */
-    token: string;
-    /** Дата истечения */
-    exp: Date;
-}
+import { RefreshToken } from './refresh-token.interface';
 
 export interface Tokens {
     /** Access Token */

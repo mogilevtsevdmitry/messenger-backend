@@ -1,4 +1,5 @@
-import { Controller, Get, Query, Inject, Patch, Delete, Body, Param, Res } from '@nestjs/common';
+import { USER_SERVICE } from '@contracts/services/user';
+import { Body, Controller, Delete, Get, Inject, Param, Patch, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags } from '@nestjs/swagger';
 import { QueryPipe } from '@shared/pipes';
@@ -7,7 +8,7 @@ import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-    constructor(@Inject('USER_SERVICE') private client: ClientProxy) {}
+    constructor(@Inject(USER_SERVICE) private client: ClientProxy) {}
 
     @Get()
     async findAll(@Query(QueryPipe) opts?: QueryDto) {

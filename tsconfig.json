@@ -35,6 +35,12 @@
       ],
       "@providers/*": [
         "libs/providers/src/*"
+      ],
+      "@contracts": [
+        "libs/contracts/src"
+      ],
+      "@contracts/*": [
+        "libs/contracts/src/*"
       ]
     }
   }

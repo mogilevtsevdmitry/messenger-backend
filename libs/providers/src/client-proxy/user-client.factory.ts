@@ -1,3 +1,4 @@
+import { USER_SERVICE } from '@contracts/services/user';
 import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
 
@@ -14,7 +15,7 @@ export const userClientProvider = (config: ConfigService): ClientProvider => {
 export const userClientFactory = (): ClientsModuleAsyncOptions => {
     return [
         {
-            name: 'USER_SERVICE',
+            name: USER_SERVICE,
             inject: [ConfigService],
             useFactory: (config: ConfigService) => userClientProvider(config),
         },

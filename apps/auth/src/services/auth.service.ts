@@ -1,3 +1,5 @@
+import { LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
+import { USER_SERVICE } from '@contracts/services/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
@@ -10,7 +12,7 @@ import { TokenService } from './token.service';
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject('USER_SERVICE') private client: ClientProxy,
+        @Inject(USER_SERVICE) private client: ClientProxy,
         private readonly tokenService: TokenService,
         private readonly prisma: PrismaService,
     ) {}
@@ -19,11 +21,11 @@ export class AuthService {
         return validate(userId, this.client);
     }
 
-    loginWithEmail(loginUserDto): Observable<Tokens> {
+    loginWithEmail(loginUserDto: LoginWithEmailNamespace.Request): Observable<Tokens> {
         return loginWithEmail(loginUserDto, this.client, this.tokenService, this.prisma);
     }
 
-    register(registerUserDto): Observable<unknown> {
+    register(registerUserDto: RegisterWithEmailNamespace.Request): Observable<unknown> {
         return register(registerUserDto, this.client);
     }
 
