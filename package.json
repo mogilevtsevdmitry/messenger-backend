@@ -109,7 +109,8 @@
     ],
     "moduleNameMapper": {
       "^@shared/shared(|/.*)$": "<rootDir>/libs/shared/src/$1",
-      "^@providers/providers(|/.*)$": "<rootDir>/libs/providers/src/$1"
+      "^@providers/providers(|/.*)$": "<rootDir>/libs/providers/src/$1",
+      "^@contracts/contracts(|/.*)$": "<rootDir>/libs/contracts/src/$1"
     }
   }
 }

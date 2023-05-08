@@ -29,6 +29,9 @@ module.exports = {
         {
           'endOfLine': 'auto',
         }
-      ]
+      ],
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/ban-types': 'off',
   },
 };
