@@ -1,4 +1,4 @@
-import { LoginWithEmailNamespace } from '@contracts/services/auth';
+import { LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AuthService } from './services/auth.service';
@@ -12,8 +12,8 @@ export class AuthController {
         return this.authService.loginWithEmail(loginUserDto);
     }
 
-    @MessagePattern({ cmd: 'register/email' })
-    registerWithEmail(registerUserDto) {
+    @MessagePattern(RegisterWithEmailNamespace.MessagePattern)
+    registerWithEmail(registerUserDto: RegisterWithEmailNamespace.Request) {
         return this.authService.register(registerUserDto);
     }
 

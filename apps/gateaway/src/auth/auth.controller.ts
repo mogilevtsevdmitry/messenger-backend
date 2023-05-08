@@ -18,7 +18,7 @@ import { Response } from 'express';
 import { catchError, map, of, tap } from 'rxjs';
 import { LoginWithEmailDto, RegisterWithEmailDto } from './dto';
 import { LoginResponse, RegisterResponse } from './responses';
-import { AuthClient, LoginWithEmailNamespace } from '@contracts/services/auth';
+import { AuthClient, LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -56,12 +56,17 @@ export class AuthController {
     @ApiOkResponse({ type: RegisterResponse })
     @Post('register/email')
     async registerByEmail(@Body() data: RegisterWithEmailDto) {
-        return this.client.send({ cmd: 'register/email' }, data).pipe(
-            map((user) => !!user),
-            catchError((err) => {
-                throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
-            }),
-        );
+        return this.client
+            .send<RegisterWithEmailNamespace.Response, RegisterWithEmailNamespace.Request>(
+                RegisterWithEmailNamespace.MessagePattern,
+                data,
+            )
+            .pipe(
+                map((user) => ({ result: !!user })),
+                catchError((err) => {
+                    throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
+                }),
+            );
     }
 
     @ApiBearerAuth()

@@ -1,12 +1,12 @@
-import { RefreshToken } from '@shared/interfaces';
+import { User } from '@contracts/interfaces';
 
-export namespace LoginWithEmailNamespace {
+export namespace RegisterWithEmailNamespace {
     /** #### Команда авторизации
      *
      * Передается в @MessagePattern
      */
     export const MessagePattern = {
-        cmd: 'login-with-email',
+        cmd: 'register-with-email',
     };
 
     /** #### Описание входящих данных
@@ -17,15 +17,12 @@ export namespace LoginWithEmailNamespace {
         email: string;
         /** Пароль пользователя */
         password: string;
+        /** Повторно пароль пользователя */
+        confirmPassword: string;
     }
 
     /** #### Описание ответа
      *
      */
-    export interface Response {
-        /** Access Token */
-        accessToken: string;
-        /** Refresh Token */
-        refreshToken: RefreshToken;
-    }
+    export type Response = User;
 }
