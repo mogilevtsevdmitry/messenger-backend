@@ -1,36 +1,43 @@
-import { Controller, Get, Query, Inject, Patch, Delete, Body, Param, Res } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    Controller,
+    Get,
+    Inject,
+    NotFoundException,
+    ParseUUIDPipe,
+    UseInterceptors,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags } from '@nestjs/swagger';
-import { QueryPipe } from '@shared/pipes';
-import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '@shared/decorators';
+import { handleTimeoutAndErrors } from '@shared/helpers';
+import { map } from 'rxjs';
+import { UserResponse } from './respnonses/user.response';
 
 @ApiTags('User')
-@Controller('users')
+@ApiBearerAuth()
+@Controller('user')
 export class UserController {
-    constructor(@Inject('USER_SERVICE') private client: ClientProxy) {}
+    constructor(@Inject('USER_SERVICE') private readonly client: ClientProxy) {}
 
+    @ApiOperation({
+        summary: 'Получение данных пользователя',
+        description: 'Получение данных авторизованного пользователя',
+    })
+    @ApiOkResponse({
+        type: UserResponse,
+    })
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get()
-    async findAll(@Query(QueryPipe) opts?: QueryDto) {
-        return this.client.send({ cmd: 'find-users' }, opts);
-    }
-
-    @Get(':userId')
-    async findOne(@Param('userId') userId: string) {
-        return this.client.send({ cmd: 'find-user' }, userId);
-    }
-
-    @Get('email/:email')
-    async findByEmail(@Param('email') email: string) {
-        return this.client.send({ cmd: 'find-by-email' }, email);
-    }
-
-    @Patch(':userId')
-    async updateOne(@Param('userId') userId: string, @Body() dto: any) {
-        return this.client.send({ cmd: 'update-user' }, { userId, dto });
-    }
-
-    @Delete(':userId')
-    async deleteOne(@Param('userId') userId: string) {
-        return this.client.send({ cmd: 'delete-user' }, userId);
+    getCurrentUser(@CurrentUser('userId', ParseUUIDPipe) userId: string) {
+        return this.client.send({ cmd: 'find-user' }, userId).pipe(
+            map((user) => {
+                if (!user) {
+                    throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+                }
+                return new UserResponse(user);
+            }),
+            handleTimeoutAndErrors(),
+        );
     }
 }

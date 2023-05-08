@@ -1,24 +1,15 @@
-import {
-    BadRequestException,
-    Body,
-    Controller,
-    HttpException,
-    HttpStatus,
-    Inject,
-    Post,
-    Res,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { AuthClient, LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
+import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Cookies, Public } from '@shared/decorators';
+import { handleTimeoutAndErrors } from '@shared/helpers';
 import { Tokens } from '@shared/interfaces';
 import { Response } from 'express';
-import { catchError, map, of, tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 import { LoginWithEmailDto, RegisterWithEmailDto } from './dto';
 import { LoginResponse, RegisterResponse } from './responses';
-import { AuthClient, LoginWithEmailNamespace, RegisterWithEmailNamespace } from '@contracts/services/auth';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -41,11 +32,8 @@ export class AuthController {
                 data,
             )
             .pipe(
-                tap((tokens) => this._setResponseWithTokens(tokens, res)),
-                catchError((err) => {
-                    new BadRequestException(err.message);
-                    return of(null);
-                }),
+                tap((tokens) => this.setResponseWithTokens(tokens, res)),
+                handleTimeoutAndErrors(),
             );
     }
 
@@ -62,10 +50,8 @@ export class AuthController {
                 data,
             )
             .pipe(
-                map((user) => ({ result: !!user })),
-                catchError((err) => {
-                    throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
-                }),
+                map((user) => !!user),
+                handleTimeoutAndErrors(),
             );
     }
 
@@ -81,10 +67,8 @@ export class AuthController {
             throw new UnauthorizedException();
         }
         return this.client.send<Tokens>({ cmd: 'refresh-tokens' }, refreshToken).pipe(
-            tap((tokens) => this._setResponseWithTokens(tokens, res)),
-            catchError((err) => {
-                throw new HttpException({ message: err.message }, HttpStatus.BAD_REQUEST);
-            }),
+            tap((tokens) => this.setResponseWithTokens(tokens, res)),
+            handleTimeoutAndErrors(),
         );
     }
 
@@ -99,7 +83,7 @@ export class AuthController {
     //     return this.client.send({ cmd: 'register-phone' }, data);
     // }
 
-    private _setResponseWithTokens(tokens: Tokens, res: Response): void {
+    private setResponseWithTokens(tokens: Tokens, res: Response): void {
         if (!tokens) {
             throw new UnauthorizedException();
         }
