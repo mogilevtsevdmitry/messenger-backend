@@ -14,7 +14,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { CurrentUser } from '@shared/decorators';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { map } from 'rxjs';
-import { UserResponse } from './respnonses/user.response';
+import { UserResponse } from './responses';
 
 @ApiTags('User')
 @ApiBearerAuth()
