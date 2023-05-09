@@ -5,7 +5,7 @@ import {
     RefreshTokensNamespace,
     RegisterWithEmailNamespace,
 } from '@contracts/services/auth';
-import { Body, Controller, HttpStatus, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -101,7 +101,7 @@ export class AuthController {
             httpOnly: true,
             sameSite: 'strict',
             expires: new Date(tokens.refreshToken.exp),
-            secure: this.configService.get('NODE_ENV') === 'production',
+            secure: this.configService.get('NODE_ENV', 'development') === 'production',
         });
         res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
     }
