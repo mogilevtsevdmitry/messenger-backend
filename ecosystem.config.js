@@ -7,7 +7,7 @@ module.exports = {
             autorestart: true,
             watch: false,
             max_memory_restart: '1G',
-            env: {
+            env_development: {
                 NODE_ENV: 'development',
             },
             env_production: {
@@ -21,7 +21,7 @@ module.exports = {
             autorestart: true,
             watch: false,
             max_memory_restart: '1G',
-            env: {
+            env_development: {
                 NODE_ENV: 'development',
             },
             env_production: {
@@ -35,7 +35,7 @@ module.exports = {
             autorestart: true,
             watch: false,
             max_memory_restart: '1G',
-            env: {
+            env_development: {
                 NODE_ENV: 'development',
             },
             env_production: {
