@@ -16,6 +16,7 @@ async function bootstrap() {
     app.use(json({ limit: '100mb' }));
     app.use(compression());
     app.use(cookieParser());
+    app.useLogger(['error', 'log', 'verbose']);
 
     /** Config Service */
     const config = app.get(ConfigService);
