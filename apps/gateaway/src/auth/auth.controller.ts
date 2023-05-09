@@ -5,10 +5,10 @@ import {
     RefreshTokensNamespace,
     RegisterWithEmailNamespace,
 } from '@contracts/services/auth';
-import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Cookies, Public } from '@shared/decorators';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { Tokens } from '@shared/interfaces';
@@ -61,7 +61,6 @@ export class AuthController {
             );
     }
 
-    @ApiBearerAuth()
     @ApiOperation({
         summary: RefreshTokensMethod.summary,
         description: RefreshTokensMethod.description,
