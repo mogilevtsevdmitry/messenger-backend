@@ -100,7 +100,7 @@ export class AuthController {
         }
         res.cookie(REFRESH_TOKEN, tokens.refreshToken.token, {
             httpOnly: true,
-            sameSite: 'strict',
+            sameSite: 'none',
             expires: new Date(tokens.refreshToken.exp),
             secure: this.configService.get('NODE_ENV', 'development') === 'production',
             path: '/',
