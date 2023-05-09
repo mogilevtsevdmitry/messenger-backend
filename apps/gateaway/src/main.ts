@@ -1,7 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'body-parser';
 import * as compression from 'compression';
@@ -9,12 +8,9 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, new ExpressAdapter());
+    const app = await NestFactory.create(AppModule);
     app.enableCors({
-        origin: (origin, callback) => {
-            // Здесь можно проверять домен перед разрешением CORS,
-            callback(null, true);
-        },
+        origin: true,
         credentials: true,
     });
     app.use(json({ limit: '100mb' }));
