@@ -24,6 +24,8 @@ async function bootstrap() {
     /** Main Api Port */
     const port = config.get<number>('API_PORT', 5000);
 
+    Logger.verbose({ NODE_ENV: config.get('NODE_ENV') }, 'bootstrap');
+
     /** Global prefix */
     app.setGlobalPrefix('api');
 
