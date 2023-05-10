@@ -13,8 +13,8 @@ async function bootstrap() {
     /** Config Service */
     const config = app.get(ConfigService);
     app.useLogger(['error', 'log', 'verbose']);
-    const allowedOrigins = config.get('ALLOW_ORIGINS', []).split(',');
-    Logger.verbose({ allowedOrigins });
+    const allowedOrigins = config.get<string>('ALLOW_ORIGINS').split(',');
+    Logger.verbose({ allowedOrigins }, 'bootstrap');
 
     app.enableCors({
         origin: (origin, callback) => {
