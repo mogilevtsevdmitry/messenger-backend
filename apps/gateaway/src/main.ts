@@ -17,14 +17,7 @@ async function bootstrap() {
     Logger.verbose({ allowedOrigins }, 'bootstrap');
 
     app.enableCors({
-        origin: (origin, callback) => {
-            Logger.verbose({ origin });
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
+        origin: allowedOrigins,
         credentials: true,
     });
     app.use(json({ limit: '100mb' }));
