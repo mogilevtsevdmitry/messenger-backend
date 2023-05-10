@@ -5,8 +5,28 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'body-parser';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
-import * as cors from 'cors';
 import { AppModule } from './app.module';
+
+const allowedHeaders = [
+    'Accept',
+    'Authorization',
+    'Content-Type',
+    'X-Requested-With',
+    'Origin',
+    'User-Agent',
+    'Referer',
+    'Sec-Fetch-Mode',
+    'Sec-Fetch-Site',
+    'Sec-Fetch-Dest',
+    'Accept-Encoding',
+    'Accept-Language',
+    'Access-Control-Request-Headers',
+    'Access-Control-Request-Method',
+    'Connection',
+    'Host',
+];
+
+const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'];
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -14,15 +34,15 @@ async function bootstrap() {
     /** Config Service */
     const config = app.get(ConfigService);
     app.useLogger(['error', 'log', 'verbose']);
-    const allowedOrigins = config.get<string>('ALLOW_ORIGINS').split(',');
-    Logger.verbose({ allowedOrigins }, 'bootstrap');
+    const origin = config.get<string>('ALLOW_ORIGINS').split(',');
+    Logger.verbose({ origin }, 'bootstrap');
 
-    app.use(
-        cors({
-            origin: allowedOrigins,
-            credentials: true,
-        }),
-    );
+    app.enableCors({
+        credentials: true,
+        origin,
+        allowedHeaders,
+        methods,
+    });
 
     app.use(json({ limit: '100mb' }));
     app.use(compression());
