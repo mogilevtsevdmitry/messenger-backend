@@ -12,10 +12,12 @@ async function bootstrap() {
 
     /** Config Service */
     const config = app.get(ConfigService);
+    app.useLogger(['error', 'log', 'verbose']);
 
     app.enableCors({
         origin: (origin, callback) => {
             const allowedOrigins = config.get('ALLOW_ORIGINS', []);
+            Logger.verbose({ origin, allowedOrigins });
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
@@ -27,7 +29,6 @@ async function bootstrap() {
     app.use(json({ limit: '100mb' }));
     app.use(compression());
     app.use(cookieParser());
-    app.useLogger(['error', 'log', 'verbose']);
 
     /** Main Api Port */
     const port = config.get<number>('API_PORT', 5000);
