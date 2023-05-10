@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { QueryDto } from '@shared/pipes/dto/query-pipe.dto';
+import { QueryDto } from '@shared/pipes';
 import { UserService } from './user.service';
 
 @Controller()
