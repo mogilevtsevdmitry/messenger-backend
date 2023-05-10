@@ -9,17 +9,25 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    /** Config Service */
+    const config = app.get(ConfigService);
+
     app.enableCors({
-        origin: '*',
+        origin: (origin, callback) => {
+            const allowedOrigins = config.get('ALLOW_ORIGINS', []);
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true,
     });
     app.use(json({ limit: '100mb' }));
     app.use(compression());
     app.use(cookieParser());
     app.useLogger(['error', 'log', 'verbose']);
-
-    /** Config Service */
-    const config = app.get(ConfigService);
 
     /** Main Api Port */
     const port = config.get<number>('API_PORT', 5000);
