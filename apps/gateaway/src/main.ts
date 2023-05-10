@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'body-parser';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
+import * as cors from 'cors';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -13,13 +14,14 @@ async function bootstrap() {
     /** Config Service */
     const config = app.get(ConfigService);
     app.useLogger(['error', 'log', 'verbose']);
-    const allowedOrigins = config.get<string>('ALLOW_ORIGINS').split(',');
-    Logger.verbose({ allowedOrigins }, 'bootstrap');
 
-    app.enableCors({
-        origin: allowedOrigins,
-        credentials: true,
-    });
+    app.use(
+        cors({
+            origin: '*',
+            credentials: true,
+        }),
+    );
+
     app.use(json({ limit: '100mb' }));
     app.use(compression());
     app.use(cookieParser());
