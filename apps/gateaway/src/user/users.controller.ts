@@ -7,7 +7,6 @@ import {
 } from '@contracts/controllers/user';
 import { USER_SERVICE } from '@contracts/services/user';
 import {
-    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -23,7 +22,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { ParseEmailPipe, QueryDto, QueryPipe } from '@shared/pipes';
-import { catchError, map } from 'rxjs';
+import { map } from 'rxjs';
 import { UserResponse } from './responses';
 
 @ApiTags('Users')
