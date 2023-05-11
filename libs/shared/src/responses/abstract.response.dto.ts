@@ -8,10 +8,4 @@ export class Response<T> extends PaginationDto {
 
     @ApiProperty({ ...AbstractResponse.data })
     data: T[];
-
-    @ApiProperty({ ...AbstractResponse.skip })
-    skip: number;
-
-    @ApiProperty({ ...AbstractResponse.take })
-    take: number;
 }
