@@ -7,17 +7,51 @@ import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
+const allowedHeaders = [
+    'Accept',
+    'Authorization',
+    'Content-Type',
+    'X-Requested-With',
+    'Origin',
+    'User-Agent',
+    'Referer',
+    'Sec-Fetch-Mode',
+    'Sec-Fetch-Site',
+    'Sec-Fetch-Dest',
+    'Accept-Encoding',
+    'Accept-Language',
+    'Access-Control-Request-Headers',
+    'Access-Control-Request-Method',
+    'Connection',
+    'Host',
+];
+
+const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'CONNECT', 'TRACE'];
+
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, { cors: true });
+    const app = await NestFactory.create(AppModule);
+
+    /** Config Service */
+    const config = app.get(ConfigService);
+    app.useLogger(['error', 'log', 'verbose']);
+    const origin = config.get<string>('ALLOW_ORIGINS').split(',');
+    Logger.verbose({ origin }, 'bootstrap');
+
+    app.enableCors({
+        credentials: true,
+        origin,
+        allowedHeaders,
+        methods,
+    });
+
     app.use(json({ limit: '100mb' }));
     app.use(compression());
     app.use(cookieParser());
 
-    /** Config Service */
-    const config = app.get(ConfigService);
-
     /** Main Api Port */
     const port = config.get<number>('API_PORT', 5000);
+
+    Logger.verbose({ NODE_ENV: config.get('NODE_ENV') }, 'bootstrap');
 
     /** Global prefix */
     app.setGlobalPrefix('api');
@@ -31,7 +65,7 @@ async function bootstrap() {
         .setTitle('Noname Messenger')
         .setDescription('## API простого мессенджера')
         .setVersion('1.0')
-        .addServer(`https://unknown-messenger.ru/`, 'DEV server')
+        .addServer(`http://95.163.240.197/api/`, 'DEV server')
         .addServer(`http://localhost:${port}/`, 'local server')
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);

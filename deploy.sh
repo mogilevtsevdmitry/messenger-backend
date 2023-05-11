@@ -17,4 +17,4 @@ npm run build && npm run build auth && npm run build user
 npm run db:push
 
 # Перезапуск всех процессов с помощью PM2
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.js --env development

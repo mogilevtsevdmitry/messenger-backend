@@ -5,10 +5,10 @@ import {
     RefreshTokensNamespace,
     RegisterWithEmailNamespace,
 } from '@contracts/services/auth';
-import { Body, Controller, HttpStatus, Inject, Post, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Inject, Logger, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Cookies, Public } from '@shared/decorators';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { Tokens } from '@shared/interfaces';
@@ -61,7 +61,6 @@ export class AuthController {
             );
     }
 
-    @ApiBearerAuth()
     @ApiOperation({
         summary: RefreshTokensMethod.summary,
         description: RefreshTokensMethod.description,
@@ -95,14 +94,16 @@ export class AuthController {
     // }
 
     private setResponseWithTokens(tokens: Tokens, res: Response): void {
+        Logger.verbose({ tokens }, `${AuthController.name}-setResponseWithTokens`);
         if (!tokens) {
             throw new UnauthorizedException();
         }
         res.cookie(REFRESH_TOKEN, tokens.refreshToken.token, {
             httpOnly: true,
-            sameSite: 'strict',
+            sameSite: 'lax',
             expires: new Date(tokens.refreshToken.exp),
-            secure: this.configService.get('NODE_ENV') === 'production',
+            secure: this.configService.get('NODE_ENV', 'development') === 'production',
+            path: '/',
         });
         res.status(HttpStatus.CREATED).json({ accessToken: tokens.accessToken });
     }
