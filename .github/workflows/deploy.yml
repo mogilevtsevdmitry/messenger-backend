@@ -22,4 +22,5 @@ jobs:
         username: ${{ secrets.INPUT_USERNAME }}
         key: ${{ secrets.INPUT_KEY }}
         script: |
-          sh messenger-backend/deploy.sh
+          cd messenger-backend/
+          sh ./deploy.sh
