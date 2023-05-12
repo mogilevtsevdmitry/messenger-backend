@@ -6,23 +6,23 @@ export namespace AbstractResponse {
         default: [],
     };
 
-    export const data = {
+    export const rows = {
         description: 'Набор данных',
         default: [],
         isArray: true,
         items: {},
     };
 
-    export const take = {
+    export const limit = {
         description: 'Сколько взять записей в БД',
         type: 'number',
         example: 4,
-        maximum: 10,
-        default: 10,
+        maximum: 30,
+        default: 25,
     };
 
-    export const skip = {
-        description: 'Сколько нужно отступить записей, что-бы взять N. Высчитывается по ф-уле: skip = skip * take',
+    export const offset = {
+        description: 'Сколько нужно отступить записей, что-бы взять N. Высчитывается по ф-уле: offset = offset * limit',
         type: 'number',
         example: 2,
     };

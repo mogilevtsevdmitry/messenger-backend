@@ -25,38 +25,37 @@ export class UserService {
     }
 
     async findAll(opts?: QueryDto) {
-        const [total, users] = await this.prisma.$transaction([
+        const [total, rows] = await this.prisma.$transaction([
             this.prisma.user.aggregate({
                 _count: { id: true },
                 where: { ...opts.where.user },
             }),
             this.prisma.user.findMany({
-                skip: opts.pagination.skip,
-                take: opts.pagination.take,
+                skip: opts.pagination.offset,
+                take: opts.pagination.limit,
                 where: { ...opts.where.user },
             }),
         ]);
-        return {
-            total: total._count.id,
-            data: users,
-            take: opts.pagination.take,
-            skip: opts.pagination.skip,
-        } as Response<User>;
+        return new Response<User>({ total, opts, rows });
     }
 
     async findOne(userId: string) {
-        return await this.prisma.user.findUnique({ where: { id: userId } });
+        const rows = await this.prisma.user.findUnique({ where: { id: userId } });
+        return new Response<User>({ rows });
     }
 
     async findByEmail(email: string) {
-        return await this.prisma.user.findFirst({ where: { email } });
+        const rows = await this.prisma.user.findFirst({ where: { email } });
+        return new Response<User>({ rows });
     }
 
-    async updateOne(userId: string, data: any) {
-        return await this.prisma.user.update({ data, where: { id: userId } });
+    async updateOne(userId: string, dto: any) {
+        const rows = await this.prisma.user.update({ data: dto, where: { id: userId } });
+        return new Response<User>({ rows });
     }
 
     async deleteOne(userId: string) {
-        return await this.prisma.user.delete({ where: { id: userId } });
+        const rows = await this.prisma.user.delete({ where: { id: userId } });
+        return new Response<User>({ rows });
     }
 }

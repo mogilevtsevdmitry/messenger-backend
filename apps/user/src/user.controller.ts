@@ -1,14 +1,13 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { QueryDto } from '@shared/pipes';
-import { Response } from '@shared/responses';
 import { UserService } from './user.service';
 
 @Controller()
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @MessagePattern({ cmd: 'create-user' })
+    @MessagePattern({ cmd: 'register-with-email' })
     async register(dto) {
         return await this.userService.create(dto);
     }

@@ -4,17 +4,19 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, IsPositive } from 'class-validator';
 
 export class PaginationDto {
-    @ApiPropertyOptional({ ...AbstractResponse.take })
+    /** Сколько взять записей в БД */
+    @ApiPropertyOptional({ ...AbstractResponse.limit })
     @IsNumber({ allowNaN: false, allowInfinity: false })
     @IsOptional()
     @IsPositive()
     @Type(() => Number)
-    take = 10;
+    limit = 10;
 
-    @ApiPropertyOptional({ ...AbstractResponse.skip })
+    /** Сколько нужно отступить записей */
+    @ApiPropertyOptional({ ...AbstractResponse.offset })
     @IsNumber({ allowNaN: false, allowInfinity: false })
     @IsOptional()
     @IsPositive()
     @Type(() => Number)
-    skip = 0;
+    offset = 0;
 }

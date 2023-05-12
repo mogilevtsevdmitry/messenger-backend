@@ -32,18 +32,14 @@ export class QueryDto {
                 where.user[key] = value;
             }
 
-            // if (pagination.is(key) && isNumber) {
-            //     pagination[key] = num;
-            // }
-
             if (isNumber) {
-                if (key === 'take' || key === 'skip') {
+                if (key === 'offset' || key === 'limit') {
                     pagination[key] = num;
                 }
             }
         }
 
-        pagination.skip *= pagination.take;
-        if (pagination.take > 10) pagination.take = 10;
+        pagination.offset *= pagination.limit;
+        if (pagination.limit > 25) pagination.limit = 25;
     }
 }
