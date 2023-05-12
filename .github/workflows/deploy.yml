@@ -18,8 +18,8 @@ jobs:
     - name: Execute remote ssh commands
       uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
+        host: ${{ secrets.INPUT_HOST }}
+        username: ${{ secrets.INPUT_USERNAME }}
+        key: ${{ secrets.INPUT_KEY }}
         script: |
           sh messenger-backend/deploy.sh
