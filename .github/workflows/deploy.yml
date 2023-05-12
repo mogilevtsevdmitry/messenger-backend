@@ -1,26 +1,23 @@
-name: Deploy to Remote Server
+name: Deploy to server
+
 on:
   push:
     branches:
       - master
+
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Install dependencies
-      run: npm ci
-    - name: Deploy to server
-      uses: easingthemes/ssh-deploy@v2.2.0
+
+    - name: Execute remote ssh commands
+      uses: appleboy/ssh-action@master
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-        remote-user: ${{ secrets.REMOTE_USER }}
-        remote-host: ${{ secrets.REMOTE_HOST }}
-        remote-port: ${{ secrets.REMOTE_PORT }}
-        local-path: .
-        remote-path: 'messenger-backend'
-    - name: Run script on server
-      run: ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} 'cd messenger-backend/ && sh deploy.sh'
+        host: ${{ secrets.REMOTE_HOST }}cd ~
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          sh messenger-backend/deploy.sh
