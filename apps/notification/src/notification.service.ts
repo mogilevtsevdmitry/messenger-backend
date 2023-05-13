@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { EmailService } from './email/email.service';
 
 @Injectable()
 export class NotificationService {
-    getHello(): string {
-        return 'Hello World!';
+    constructor(private readonly emailService: EmailService) {}
+
+    sendConfirmationEmail() {
+        return this.emailService.send();
     }
 }

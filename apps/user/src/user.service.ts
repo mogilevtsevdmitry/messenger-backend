@@ -36,26 +36,26 @@ export class UserService {
                 where: { ...opts.where.user },
             }),
         ]);
-        return new Response<User>({ total, opts, rows });
+        return Response.returnMany<User>({ total, opts, rows });
     }
 
     async findOne(userId: string) {
-        const rows = await this.prisma.user.findUnique({ where: { id: userId } });
-        return new Response<User>({ rows });
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 
     async findByEmail(email: string) {
-        const rows = await this.prisma.user.findFirst({ where: { email } });
-        return new Response<User>({ rows });
+        const user = await this.prisma.user.findFirst({ where: { email } });
+        return Response.returnOne<User>(user);
     }
 
     async updateOne(userId: string, dto: any) {
-        const rows = await this.prisma.user.update({ data: dto, where: { id: userId } });
-        return new Response<User>({ rows });
+        const user = await this.prisma.user.update({ data: dto, where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 
     async deleteOne(userId: string) {
-        const rows = await this.prisma.user.delete({ where: { id: userId } });
-        return new Response<User>({ rows });
+        const user = await this.prisma.user.delete({ where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 }

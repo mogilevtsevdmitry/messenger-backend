@@ -2,7 +2,7 @@ import { AbstractResponse } from '@contracts/controllers/responses';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaginationDto, QueryDto } from '@shared/pipes';
 
-export interface IResponse<T> {
+export interface IResponseMany<T> {
     total?: number | { _count: { id: number } };
     rows: T | T[];
     offset?: number;
@@ -10,7 +10,7 @@ export interface IResponse<T> {
     opts?: QueryDto;
 }
 
-export class Response<T> extends PaginationDto {
+export class ResponseMany<T> extends PaginationDto {
     /** Кол-во записей в БД */
     @ApiProperty({ ...AbstractResponse.total })
     total: number;
@@ -19,7 +19,7 @@ export class Response<T> extends PaginationDto {
     @ApiProperty({ ...AbstractResponse.rows })
     rows: Partial<T>[];
 
-    constructor(response: IResponse<Partial<T>>) {
+    constructor(response: IResponseMany<Partial<T>>) {
         super();
 
         if (!Array.isArray(response.rows)) {

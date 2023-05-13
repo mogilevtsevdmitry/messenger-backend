@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NOTIFICATION_SERVICE } from '@contracts/services/notification';
 import { Logger } from '@nestjs/common/services';
 import { ConfigService } from '@nestjs/config';

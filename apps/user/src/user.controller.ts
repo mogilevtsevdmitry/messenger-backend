@@ -1,3 +1,11 @@
+import { RegisterWithEmailNamespace } from '@contracts/services/auth';
+import {
+    DeleteUserNamespace,
+    FindUserNamespace,
+    FindUsersNamespace,
+    UpdateUserNamespace,
+} from '@contracts/services/user';
+import { FindUserByEmailNamespace } from '@contracts/services/user/methods/find-user-by-email';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { QueryDto } from '@shared/pipes';
@@ -7,32 +15,32 @@ import { UserService } from './user.service';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @MessagePattern({ cmd: 'register-with-email' })
-    async register(dto) {
-        return await this.userService.create(dto);
+    @MessagePattern(RegisterWithEmailNamespace.MessagePattern)
+    async register(data) {
+        return await this.userService.create(data);
     }
 
-    @MessagePattern({ cmd: 'find-users' })
+    @MessagePattern(FindUsersNamespace.MessagePattern)
     async findAll(opts?: QueryDto) {
         return await this.userService.findAll(opts);
     }
 
-    @MessagePattern({ cmd: 'find-user' })
+    @MessagePattern(FindUserNamespace.MessagePattern)
     async findOne(id: string) {
         return await this.userService.findOne(id);
     }
 
-    @MessagePattern({ cmd: 'find-by-email' })
+    @MessagePattern(FindUserByEmailNamespace.MessagePattern)
     async findByEmail(email: string) {
         return await this.userService.findByEmail(email);
     }
 
-    @MessagePattern({ cmd: 'update-user' })
+    @MessagePattern(UpdateUserNamespace.MessagePattern)
     async updateOne(data: { userId: string; dto: any }) {
         return await this.userService.updateOne(data.userId, data.dto);
     }
 
-    @MessagePattern({ cmd: 'delete-user' })
+    @MessagePattern(DeleteUserNamespace.MessagePattern)
     async deleteOne(id: string) {
         return await this.userService.deleteOne(id);
     }

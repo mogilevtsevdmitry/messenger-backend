@@ -1,6 +1,7 @@
 import { AuthHelper } from '@auth-app/services/auth.helper';
 import { TokenService } from '@auth-app/services/token.service';
 import { LoginWithEmailNamespace } from '@contracts/services/auth';
+import { FindUserByEmailNamespace } from '@contracts/services/user/methods/find-user-by-email';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { Tokens, User } from '@shared/interfaces';
@@ -12,7 +13,7 @@ export const loginWithEmail = (
     tokenService: TokenService,
     prisma: PrismaService,
 ): Observable<Tokens> => {
-    return client.send<User>({ cmd: 'find-by-email' }, loginUserDto.email).pipe(
+    return client.send<User>(FindUserByEmailNamespace.MessagePattern, loginUserDto.email).pipe(
         tap((user) => {
             if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                 throw new RpcException('Не верный email или пароль');
