@@ -7,11 +7,11 @@ export class EmailService {
 
     async send() {
         this.mailerService.sendMail({
-            to: 'zitpot.ru@gmail.com', // list of receivers
-            from: 'noreply@nestjs.com', // sender address
-            subject: 'Testing Nest MailerModule ✔', // Subject line
-            text: 'welcome', // plaintext body
-            html: '<b>welcome</b>', // HTML body content
+            to: 'zitpot.ru@gmail.com',
+            from: 'noreply@nestjs.com',
+            subject: 'Testing Nest MailerModule ✔',
+            text: 'welcome',
+            html: '<b>welcome</b>',
         });
     }
 }

@@ -3,7 +3,7 @@
     "collection": "@nestjs/schematics",
     "sourceRoot": "apps/gateaway/src",
     "compilerOptions": {
-        "assets": ["apps/notification/src/templates/**/*.hbs"],
+        "assets": ["**/*.hbs"],
         "deleteOutDir": true,
         "watchAssets": true,
         "webpack": true,

@@ -8,7 +8,7 @@ import {
 import { FindUserByEmailNamespace } from '@contracts/services/user/methods/find-user-by-email';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { QueryDto } from '@shared/pipes';
+import { IQueryPipe } from '@shared/pipes';
 import { UserService } from './user.service';
 
 @Controller()
@@ -21,7 +21,7 @@ export class UserController {
     }
 
     @MessagePattern(FindUsersNamespace.MessagePattern)
-    async findAll(opts?: QueryDto) {
+    async findAll(opts?: IQueryPipe) {
         return await this.userService.findAll(opts);
     }
 

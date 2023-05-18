@@ -1,13 +1,14 @@
 import { AbstractResponse } from '@contracts/controllers/responses';
 import { ApiProperty } from '@nestjs/swagger';
-import { PaginationDto, QueryDto } from '@shared/pipes';
+import { PaginationDto } from '@shared/pipes';
+import { IQueryPipe } from '@shared/pipes/query.interface';
 
 export interface IResponseMany<T> {
     total?: number | { _count: { id: number } };
     rows: T | T[];
     offset?: number;
     limit?: number;
-    opts?: QueryDto;
+    opts?: IQueryPipe;
 }
 
 export class ResponseMany<T> extends PaginationDto {
@@ -38,7 +39,7 @@ export class ResponseMany<T> extends PaginationDto {
             this.total = response.total;
         }
 
-        this.offset = response.offset || response.opts?.pagination.offset || 0;
+        this.offset = response.offset || response.opts.pagination.offset || 0;
         this.limit = response.limit || response.opts?.pagination.limit || this.total;
     }
 }

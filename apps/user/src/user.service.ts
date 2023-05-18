@@ -1,7 +1,8 @@
+import { RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { User } from '@shared/interfaces';
-import { QueryDto } from '@shared/pipes';
+import { IQueryPipe } from '@shared/pipes';
 import { Response } from '@shared/responses';
 import { genSalt, hash } from 'bcrypt';
 
@@ -9,10 +10,10 @@ import { genSalt, hash } from 'bcrypt';
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create(data: { email: string; password: string }) {
+    async create(data: RegisterWithEmailNamespace.Request): Promise<RegisterWithEmailNamespace.Response> {
         const hashedPassword = await hash(data.password, await genSalt(10));
 
-        return await this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email: data.email,
                 password: hashedPassword,
@@ -22,9 +23,11 @@ export class UserService {
                 status: '',
             },
         });
+
+        return Response.returnOne<User>(user);
     }
 
-    async findAll(opts?: QueryDto) {
+    async findAll(opts?: IQueryPipe) {
         const [total, rows] = await this.prisma.$transaction([
             this.prisma.user.aggregate({
                 _count: { id: true },
