@@ -14,7 +14,7 @@ rm -rf dist
 npm run build && npm run build auth && npm run build user
 
 # Накатывание миграций
-npm run db:push
+npm run migrate:generate
 
 # Перезапуск всех процессов с помощью PM2
 pm2 start ecosystem.config.js --env development

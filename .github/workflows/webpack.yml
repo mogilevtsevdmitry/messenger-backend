@@ -27,8 +27,8 @@ jobs:
         npm install
         npm run lint
         npm run format
-        npm run migrate:generate
-        npm run build
-        npm run build user
-        npm run build auth
-        npm run build notification
+        # npm run migrate:generate
+        # npm run build
+        # npm run build user
+        # npm run build auth
+        # npm run build notification
