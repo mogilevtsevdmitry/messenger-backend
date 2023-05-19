@@ -26,12 +26,12 @@ export class UserController {
     }
 
     @MessagePattern(FindUserNamespace.MessagePattern)
-    async findOne(id: string) {
+    async findOne({ id }: FindUserNamespace.Request) {
         return await this.userService.findOne(id);
     }
 
     @MessagePattern(FindUserByEmailNamespace.MessagePattern)
-    async findByEmail(email: string) {
+    async findByEmail({ email }: FindUserByEmailNamespace.Request) {
         return await this.userService.findByEmail(email);
     }
 

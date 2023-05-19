@@ -94,7 +94,6 @@ export class AuthController {
     // }
 
     private setResponseWithTokens(tokens: Tokens, res: Response): void {
-        Logger.verbose({ tokens }, `${AuthController.name}-setResponseWithTokens`);
         if (!tokens) {
             throw new UnauthorizedException();
         }

@@ -7,7 +7,20 @@
         "deleteOutDir": true,
         "watchAssets": true,
         "webpack": true,
-        "tsConfigPath": "apps/gateaway/tsconfig.app.json"
+        "tsConfigPath": "apps/gateaway/tsconfig.app.json",
+        "plugins": [
+            {
+                "name": "@nestjs/swagger",
+                "options": {
+                    "classValidatorShim": false,
+                    "introspectComments": true,
+                    "dtoFileNameSuffix":[
+                        ".dto.ts",
+                        ".response.ts"
+                    ]
+                }
+            }
+        ]
     },
     "monorepo": true,
     "root": "apps/gateaway",

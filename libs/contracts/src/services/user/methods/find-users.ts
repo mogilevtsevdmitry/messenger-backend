@@ -1,4 +1,5 @@
 import { User } from '@shared/interfaces';
+import { IQueryPipe } from '@shared/pipes';
 
 export namespace FindUsersNamespace {
     /** #### Команда авторизации
@@ -12,10 +13,15 @@ export namespace FindUsersNamespace {
     /** #### Описание входящих данных
      *
      */
-    export type Request = User;
+    export type Request = IQueryPipe;
 
     /** #### Описание ответа
      *
      */
-    export type Response = User;
+    export type Response = {
+        limit: number;
+        offset: number;
+        total: number;
+        rows: User[];
+    };
 }

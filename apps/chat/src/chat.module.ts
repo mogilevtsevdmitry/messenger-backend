@@ -10,14 +10,14 @@ import { ServicesModule } from './services/services.module';
     imports: [SharedModule, ServicesModule, AuthModule],
     providers: [
         ChatGateway,
-        // {
-        //     provide: APP_GUARD,
-        //     useClass: JwtGuard,
-        // },
-        // {
-        //     provide: APP_GUARD,
-        //     useClass: RolesGuard,
-        // },
+        {
+            provide: APP_GUARD,
+            useClass: JwtGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
     ],
 })
 export class ChatModule {}

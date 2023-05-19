@@ -47,7 +47,10 @@ export class UsersController {
     @ApiQuery({ type: PaginationDto })
     @Get(FindUsersMethod.path)
     async findAll(@Query(QueryPipe) opts?: IQueryPipe) {
-        return this.client.send(FindUsersNamespace.MessagePattern, opts);
+        return this.client.send<FindUsersNamespace.Response, FindUsersNamespace.Request>(
+            FindUsersNamespace.MessagePattern,
+            opts,
+        );
     }
 
     @ApiOperation({

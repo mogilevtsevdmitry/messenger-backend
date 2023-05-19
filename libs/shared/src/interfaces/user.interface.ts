@@ -49,4 +49,10 @@ export interface User {
 
     /** Роли пользователя */
     roles: string[];
+
+    /** Пользователь онлайн */
+    isOnline?: boolean;
+
+    /** Идентификатор сокета при подключении пользователя */
+    socketId?: string;
 }

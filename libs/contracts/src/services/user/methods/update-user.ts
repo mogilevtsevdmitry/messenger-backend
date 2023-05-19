@@ -12,7 +12,7 @@ export namespace UpdateUserNamespace {
     /** #### Описание входящих данных
      *
      */
-    export type Request = User;
+    export type Request = Pick<User, 'id'> & Partial<Omit<User, 'id'>>;
 
     /** #### Описание ответа
      *

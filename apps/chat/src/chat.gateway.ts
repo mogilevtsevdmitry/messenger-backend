@@ -1,21 +1,28 @@
 import { ChatGatewayNamespace } from '@contracts/chat';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
+    ConnectedSocket,
+    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
 } from '@nestjs/websockets';
+import { User } from '@shared/interfaces';
 import { Socket } from 'socket.io';
 import { UserService } from './services/user.service';
+import { Subject, takeUntil } from 'rxjs';
+import { DirectMessageDto } from './dto';
+import { UserPayload } from '@shared/decorators';
 
 @WebSocketGateway(ChatGatewayNamespace.Port, { namespace: ChatGatewayNamespace.Namespace, cors: true })
-export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
     private readonly logger = new Logger(ChatGateway.name);
-    private clients: Map<string, Socket> = new Map();
+    private clients: Map<string, { socket: Socket; user: User }> = new Map();
+    private readonly destroy$ = new Subject<void>();
 
     constructor(
         private readonly userService: UserService,
@@ -28,21 +35,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     /** Подключение пользователя */
-    handleConnection(client: Socket) {
-        this.clients.set(client.id, client);
-        this.logger.debug(`Client connected: ${client.id}`);
-
-        try {
-            const token = client.handshake.headers?.authorization.split(' ')[1];
-            this.logger.debug({ token });
-            const user = this.jwt.verify(token, this.configService.get('JWT_ACCESS_TOKEN_SECRET'));
-            this.logger.debug(user);
-            client['user'] = user;
-            this.userService.currentUser(user.userId).subscribe((res) => this.logger.debug(res));
-        } catch (err) {
-            client.disconnect();
-        }
-        // Пользователь залогинен
+    handleConnection(socket: Socket) {
+        this.logger.debug(`Client connected: ${this._handleConnection(socket)}`);
     }
 
     /** Отключение пользователя */
@@ -53,11 +47,32 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     // Личный чат
     @SubscribeMessage(ChatGatewayNamespace.DirectMessage)
-    handlePrivateChat(client: Socket, payload: any): void {
-        const { recipientId, message } = payload;
+    handlePrivateChat(@MessageBody() payload: DirectMessageDto, @ConnectedSocket() socket: Socket): void {
+        const { recipientId, text } = payload;
         const recipient = this.clients.get(recipientId);
+        const senderId = this._handleConnection(socket);
         if (recipient) {
-            recipient.emit(ChatGatewayNamespace.DirectMessage, { senderId: client.id, message });
+            recipient.socket.emit(ChatGatewayNamespace.DirectMessage, { senderId, text });
+        }
+    }
+
+    onModuleDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    private _handleConnection(socket: Socket): string {
+        try {
+            const token = socket.handshake.headers?.authorization.split(' ')[1];
+            const user = this.jwt.verify<UserPayload>(token, this.configService.get('JWT_ACCESS_TOKEN_SECRET'));
+            socket['user'] = user;
+            this.userService
+                .currentUser(user.userId)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe((user) => this.clients.set(user.id, { socket, user }));
+            return user.userId;
+        } catch (err) {
+            socket.disconnect();
         }
     }
 }
