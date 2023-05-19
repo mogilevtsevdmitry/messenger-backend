@@ -4,9 +4,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { SharedModule } from '@shared';
 import { JwtGuard, RolesGuard } from '@shared/guards';
 import { ChatGateway } from './chat.gateway';
+import { ServicesModule } from './services/services.module';
 
 @Module({
-    imports: [SharedModule, AuthModule],
+    imports: [SharedModule, ServicesModule, AuthModule],
     providers: [
         ChatGateway,
         // {
