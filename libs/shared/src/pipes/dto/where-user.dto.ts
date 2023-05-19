@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { faker } from '@faker-js/faker';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsUUID, IsString, IsEmail } from 'class-validator';
@@ -11,6 +12,7 @@ export class WhereUserDto {
     @IsUUID()
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     id?: string = undefined;
 
     @ApiPropertyOptional({
@@ -21,6 +23,7 @@ export class WhereUserDto {
     @IsEmail()
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     email?: string = undefined;
 
     @ApiPropertyOptional({
@@ -30,6 +33,7 @@ export class WhereUserDto {
     })
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     nickname?: string = undefined;
 
     @ApiPropertyOptional({
@@ -39,6 +43,7 @@ export class WhereUserDto {
     })
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     firstName?: string = undefined;
 
     @ApiPropertyOptional({
@@ -48,6 +53,7 @@ export class WhereUserDto {
     })
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     lastName?: string = undefined;
 
     @ApiPropertyOptional({
@@ -57,7 +63,6 @@ export class WhereUserDto {
     })
     @IsString()
     @IsOptional()
+    @Expose({ groups: ['user'] })
     sex?: string = undefined;
-
-    is = (key: string) => ['id', 'email', 'nickname', 'firstName', 'lastName', 'sex'].includes(key);
 }

@@ -5,7 +5,14 @@ import {
     FindUsersMethod,
     UpdateUserMethod,
 } from '@contracts/controllers/user';
-import { USER_SERVICE } from '@contracts/services/user';
+import { RegisterWithEmailNamespace } from '@contracts/services/auth';
+import {
+    DeleteUserNamespace,
+    FindUserNamespace,
+    FindUsersNamespace,
+    UpdateUserNamespace,
+    USER_SERVICE,
+} from '@contracts/services/user';
 import {
     Body,
     Controller,
@@ -19,11 +26,13 @@ import {
     Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
-import { ParseEmailPipe, QueryDto, QueryPipe } from '@shared/pipes';
+import { ParseEmailPipe, QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
 import { map } from 'rxjs';
 import { UserResponse } from './responses';
+import { ResponseMany } from '@shared/responses';
+import { User } from '@shared/interfaces';
 
 @ApiTags('Users')
 @Controller('users')
@@ -34,10 +43,11 @@ export class UsersController {
         summary: FindUsersMethod.summary,
         description: FindUsersMethod.description,
     })
-    @ApiOkResponse({ type: [UserResponse] })
+    @ApiOkResponse({ type: ResponseMany<User> })
+    @ApiQuery({ type: PaginationDto })
     @Get(FindUsersMethod.path)
-    async findAll(@Query(QueryPipe) opts?: QueryDto) {
-        return this.client.send({ cmd: 'find-users' }, opts);
+    async findAll(@Query(QueryPipe) opts?: IQueryPipe) {
+        return this.client.send(FindUsersNamespace.MessagePattern, opts);
     }
 
     @ApiOperation({
@@ -47,7 +57,7 @@ export class UsersController {
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserMethod.path)
     async findOne(@Param('userId', ParseUUIDPipe) userId: string) {
-        return this.client.send({ cmd: 'find-user' }, userId);
+        return this.client.send(FindUserNamespace.MessagePattern, userId);
     }
 
     @ApiOperation({
@@ -57,7 +67,7 @@ export class UsersController {
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserByEmail.path)
     async findByEmail(@Param('email', ParseEmailPipe) email: string) {
-        return this.client.send({ cmd: 'find-by-email' }, email);
+        return this.client.send(RegisterWithEmailNamespace.MessagePattern, email);
     }
 
     @ApiOperation({
@@ -67,7 +77,7 @@ export class UsersController {
     @ApiOkResponse({ type: UserResponse })
     @Put(UpdateUserMethod.path)
     async updateOne(@Param('userId', ParseUUIDPipe) userId: string, @Body() dto: Exclude<UserResponse, 'id'>) {
-        return this.client.send({ cmd: 'update-user' }, { userId, dto }).pipe(
+        return this.client.send(UpdateUserNamespace.MessagePattern, { userId, dto }).pipe(
             map((user) => {
                 if (!user) {
                     throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
@@ -85,6 +95,6 @@ export class UsersController {
     @ApiOkResponse({ type: UserResponse })
     @Delete(DeleteUserMethod.path)
     async deleteOne(@Param('userId', ParseUUIDPipe) userId: string) {
-        return this.client.send({ cmd: 'delete-user' }, userId);
+        return this.client.send(DeleteUserNamespace.MessagePattern, userId);
     }
 }

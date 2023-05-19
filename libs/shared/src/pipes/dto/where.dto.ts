@@ -1,9 +1,11 @@
+import { Expose } from 'class-transformer';
 import { WhereTokenDto } from './where-token.dto';
 import { WhereUserDto } from './where-user.dto';
 
 export class WhereDto {
-    user? = new WhereUserDto();
-    token? = new WhereTokenDto();
+    @Expose({ groups: ['where'] })
+    user: WhereUserDto;
 
-    is = (key: string) => ['user', 'token'].includes(key);
+    @Expose({ groups: ['where'] })
+    token: WhereTokenDto;
 }

@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsPositive, IsUUID } from 'class-validator';
 
@@ -11,7 +12,6 @@ export class WhereTokenDto {
     @IsUUID()
     @IsOptional()
     @IsPositive()
-    userId?: string = undefined;
-
-    is = (key: string) => ['userId'].includes(key);
+    @Expose({ groups: ['token'] })
+    userId?: string;
 }

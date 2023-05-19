@@ -1,4 +1,3 @@
-export * from './query-pipe.dto';
 export * from './pagination.dto';
 export * from './where.dto';
 export * from './include.dto';
