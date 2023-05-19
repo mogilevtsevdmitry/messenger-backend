@@ -29,7 +29,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { ParseEmailPipe, QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { UserResponse } from './responses';
 import { ResponseMany } from '@shared/responses';
 import { User } from '@shared/interfaces';
@@ -46,8 +46,11 @@ export class UsersController {
     @ApiOkResponse({ type: ResponseMany<User> })
     @ApiQuery({ type: PaginationDto })
     @Get(FindUsersMethod.path)
-    async findAll(@Query(QueryPipe) opts?: IQueryPipe) {
-        return this.client.send(FindUsersNamespace.MessagePattern, opts);
+    async findAll(@Query(QueryPipe) opts?: IQueryPipe): Promise<Observable<ResponseMany<User>>> {
+        return this.client.send<ResponseMany<FindUsersNamespace.Response>, IQueryPipe>(
+            FindUsersNamespace.MessagePattern,
+            opts,
+        );
     }
 
     @ApiOperation({
@@ -56,7 +59,8 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserMethod.path)
-    async findOne(@Param('userId', ParseUUIDPipe) userId: string) {
+    findOne(@Param('userId', ParseUUIDPipe) userId: string): Observable<any> {
+        console.log(`FF`, userId);
         return this.client.send(FindUserNamespace.MessagePattern, userId);
     }
 
@@ -66,7 +70,7 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserByEmail.path)
-    async findByEmail(@Param('email', ParseEmailPipe) email: string) {
+    findByEmail(@Param('email', ParseEmailPipe) { email }: Pick<FindUserNamespace.Request, 'email'>): Observable<any> {
         return this.client.send(RegisterWithEmailNamespace.MessagePattern, email);
     }
 
@@ -76,7 +80,10 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Put(UpdateUserMethod.path)
-    async updateOne(@Param('userId', ParseUUIDPipe) userId: string, @Body() dto: Exclude<UserResponse, 'id'>) {
+    updateOne(
+        @Param('userId', ParseUUIDPipe) userId: string,
+        @Body() dto: FindUserNamespace.Response,
+    ): Observable<any> {
         return this.client.send(UpdateUserNamespace.MessagePattern, { userId, dto }).pipe(
             map((user) => {
                 if (!user) {
@@ -94,7 +101,7 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Delete(DeleteUserMethod.path)
-    async deleteOne(@Param('userId', ParseUUIDPipe) userId: string) {
+    deleteOne(@Param('userId', ParseUUIDPipe) userId: string) {
         return this.client.send(DeleteUserNamespace.MessagePattern, userId);
     }
 }
