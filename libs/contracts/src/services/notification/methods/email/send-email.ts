@@ -1,9 +1,9 @@
-export namespace SendConfirmationNamespace {
+export namespace SendEmailNamespace {
     /** #### Команда авторизации
      *
      * Передается в @MessagePattern
      */
     export const MessagePattern = {
-        cmd: 'email-send-confirmation',
+        cmd: 'send-email',
     };
 }

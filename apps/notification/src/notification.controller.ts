@@ -1,4 +1,4 @@
-import { SendConfirmationNamespace } from '@contracts/services/notification';
+import { SendEmailNamespace } from '@contracts/services/notification';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { NotificationService } from './notification.service';
@@ -7,9 +7,9 @@ import { NotificationService } from './notification.service';
 export class NotificationController {
     constructor(private readonly notificationService: NotificationService) {}
 
-    @MessagePattern({ ...SendConfirmationNamespace.MessagePattern })
-    sendConfirmationEmail() {
+    @MessagePattern(SendEmailNamespace.MessagePattern)
+    sendEmail() {
         console.log(`triggered`);
-        return this.notificationService.sendConfirmationEmail();
+        return this.notificationService.sendEmail();
     }
 }

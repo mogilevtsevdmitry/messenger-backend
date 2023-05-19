@@ -5,7 +5,7 @@ import { EmailService } from './email/email.service';
 export class NotificationService {
     constructor(private readonly emailService: EmailService) {}
 
-    sendConfirmationEmail() {
+    sendEmail() {
         return this.emailService.send();
     }
 }
