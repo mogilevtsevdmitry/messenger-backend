@@ -30,3 +30,4 @@ jobs:
         npm run build
         npm run build user
         npm run build auth
+        npm run build notification

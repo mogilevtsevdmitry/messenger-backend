@@ -27,7 +27,7 @@
         "docker:down": "docker-compose -f ./docker/postgres/docker-compose.yml down",
         "start:all": "concurrently \"npm run start\" \"npm run start:auth\" \"npm run start:user\"",
         "start:all:dev": "concurrently \"nest start --watch\" \"nest start auth --watch\" \"nest start user --watch\" \"nest start notification --watch\"",
-        "migrate:generate": "npx prisma migrate dev --schema libs/providers/src/prisma/schema.prisma --name ",
+        "migrate:generate": "npx prisma migrate dev --schema libs/providers/src/prisma/schema.prisma",
         "migrate:deploy": "npx prisma migrate deploy --schema libs/providers/src/prisma/schema.prisma",
         "db:push": "npx prisma db push --schema libs/providers/src/prisma/schema.prisma",
         "db:pull": "npx prisma db pull --schema libs/providers/src/prisma/schema.prisma"

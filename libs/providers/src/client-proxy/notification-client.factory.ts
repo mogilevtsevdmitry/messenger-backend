@@ -1,5 +1,6 @@
 import { NOTIFICATION_SERVICE } from '@contracts/services/notification';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
@@ -26,6 +27,9 @@ export const notificationClientFactory = (): ClientsModuleAsyncOptions => {
 
 export const getEmailConfig = async (config: ConfigService) => {
     const transport = config.get<string>('NOTIFICATION_SERVICE_EMAIL_TRANSPORT');
+    if (!transport) {
+        throw new Error('Необходимо определить переменную "NOTIFICATION_SERVICE_EMAIL_TRANSPORT" в .env');
+    }
     const name = config.get<string>('NOTIFICATION_SERVICE_EMAIL_FROM_NAME');
     const address = transport.split(':')[1].split('//')[1];
 
