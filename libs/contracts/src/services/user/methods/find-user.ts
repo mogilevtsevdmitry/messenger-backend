@@ -12,7 +12,10 @@ export namespace FindUserNamespace {
     /** #### Описание входящих данных
      *
      */
-    export type Request = User;
+    export type Request = {
+        /** Идентификатор пользователя */
+        id: string;
+    };
 
     /** #### Описание ответа
      *

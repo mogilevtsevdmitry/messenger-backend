@@ -32,14 +32,18 @@ export class UserController {
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(FindCurrentUserMethod.path)
     getCurrentUser(@CurrentUser('userId', ParseUUIDPipe) userId: string) {
-        return this.client.send(FindUserNamespace.MessagePattern, userId).pipe(
-            map((user) => {
-                if (!user) {
-                    throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
-                }
-                return new UserResponse(user);
-            }),
-            handleTimeoutAndErrors(),
-        );
+        return this.client
+            .send<FindUserNamespace.Response, FindUserNamespace.Request>(FindUserNamespace.MessagePattern, {
+                id: userId,
+            })
+            .pipe(
+                map((user) => {
+                    if (!user) {
+                        throw new NotFoundException(`Пользователь с ID ${userId} не найден`);
+                    }
+                    return new UserResponse(user);
+                }),
+                handleTimeoutAndErrors(),
+            );
     }
 }

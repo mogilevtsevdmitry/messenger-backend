@@ -57,7 +57,10 @@ export class UsersController {
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserMethod.path)
     async findOne(@Param('userId', ParseUUIDPipe) userId: string) {
-        return this.client.send(FindUserNamespace.MessagePattern, userId);
+        return this.client.send<FindUserNamespace.Response, FindUserNamespace.Request>(
+            FindUserNamespace.MessagePattern,
+            { id: userId },
+        );
     }
 
     @ApiOperation({
