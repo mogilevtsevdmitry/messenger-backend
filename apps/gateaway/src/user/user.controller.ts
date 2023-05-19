@@ -1,5 +1,5 @@
 import { FindCurrentUserMethod } from '@contracts/controllers/user';
-import { USER_SERVICE } from '@contracts/services/user';
+import { FindUserNamespace, USER_SERVICE } from '@contracts/services/user';
 import {
     ClassSerializerInterceptor,
     Controller,
@@ -32,7 +32,7 @@ export class UserController {
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(FindCurrentUserMethod.path)
     getCurrentUser(@CurrentUser('userId', ParseUUIDPipe) userId: string) {
-        return this.client.send({ cmd: 'find-user' }, userId).pipe(
+        return this.client.send(FindUserNamespace.MessagePattern, userId).pipe(
             map((user) => {
                 if (!user) {
                     throw new NotFoundException(`Пользователь с ID ${userId} не найден`);

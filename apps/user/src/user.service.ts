@@ -1,7 +1,8 @@
+import { RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { User } from '@shared/interfaces';
-import { QueryDto } from '@shared/pipes';
+import { IQueryPipe } from '@shared/pipes';
 import { Response } from '@shared/responses';
 import { genSalt, hash } from 'bcrypt';
 
@@ -9,10 +10,10 @@ import { genSalt, hash } from 'bcrypt';
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create(data: { email: string; password: string }) {
+    async create(data: RegisterWithEmailNamespace.Request): Promise<RegisterWithEmailNamespace.Response> {
         const hashedPassword = await hash(data.password, await genSalt(10));
 
-        return await this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email: data.email,
                 password: hashedPassword,
@@ -22,41 +23,42 @@ export class UserService {
                 status: '',
             },
         });
+
+        return Response.returnOne<User>(user);
     }
 
-    async findAll(opts?: QueryDto) {
-        const [total, users] = await this.prisma.$transaction([
+    async findAll(opts?: IQueryPipe) {
+        const [total, rows] = await this.prisma.$transaction([
             this.prisma.user.aggregate({
                 _count: { id: true },
                 where: { ...opts.where.user },
             }),
             this.prisma.user.findMany({
-                skip: opts.pagination.skip,
-                take: opts.pagination.take,
+                skip: opts.pagination.offset,
+                take: opts.pagination.limit,
                 where: { ...opts.where.user },
             }),
         ]);
-        return {
-            total: total._count.id,
-            data: users,
-            take: opts.pagination.take,
-            skip: opts.pagination.skip,
-        } as Response<User>;
+        return Response.returnMany<User>({ total, opts, rows });
     }
 
     async findOne(userId: string) {
-        return await this.prisma.user.findUnique({ where: { id: userId } });
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 
     async findByEmail(email: string) {
-        return await this.prisma.user.findFirst({ where: { email } });
+        const user = await this.prisma.user.findFirst({ where: { email } });
+        return Response.returnOne<User>(user);
     }
 
-    async updateOne(userId: string, data: any) {
-        return await this.prisma.user.update({ data, where: { id: userId } });
+    async updateOne(userId: string, dto: any) {
+        const user = await this.prisma.user.update({ data: dto, where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 
     async deleteOne(userId: string) {
-        return await this.prisma.user.delete({ where: { id: userId } });
+        const user = await this.prisma.user.delete({ where: { id: userId } });
+        return Response.returnOne<User>(user);
     }
 }
