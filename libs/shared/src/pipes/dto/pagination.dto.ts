@@ -1,20 +1,25 @@
 import { AbstractResponse } from '@contracts/controllers/responses';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsPositive } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
+import { IsNumber, IsPositive, Max, Min } from 'class-validator';
 
 export class PaginationDto {
-    @ApiPropertyOptional({ ...AbstractResponse.take })
+    /** Сколько взять записей в БД */
+    @ApiPropertyOptional({ ...AbstractResponse.limit })
     @IsNumber({ allowNaN: false, allowInfinity: false })
-    @IsOptional()
     @IsPositive()
+    @Max(100)
+    @Min(1)
     @Type(() => Number)
-    take = 10;
+    @Expose({ groups: ['pagination'] })
+    limit = 100;
 
-    @ApiPropertyOptional({ ...AbstractResponse.skip })
+    /** Сколько нужно отступить записей */
+    @ApiPropertyOptional({ ...AbstractResponse.offset })
     @IsNumber({ allowNaN: false, allowInfinity: false })
-    @IsOptional()
     @IsPositive()
+    @Min(0)
     @Type(() => Number)
-    skip = 0;
+    @Expose({ groups: ['pagination'] })
+    offset = 0;
 }

@@ -1,1 +1,2 @@
-export * from './abstract.response.dto';
+export * from './abstract.response';
+export * from './response-many';

@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsOptional, IsPositive } from 'class-validator';
+import { Type, Expose } from 'class-transformer';
+import { IsPositive } from 'class-validator';
 
 export class IncludeDto {
     @ApiPropertyOptional({
@@ -9,10 +9,10 @@ export class IncludeDto {
         type: 'boolean',
         default: false,
     })
-    @IsOptional()
     @IsPositive()
     @Type(() => Boolean)
-    user?: boolean = false;
+    @Expose({ groups: ['include'] })
+    user = false;
 
     @ApiPropertyOptional({
         description: 'Вернуть ли токен в ответ',
@@ -20,9 +20,7 @@ export class IncludeDto {
         example: true,
         default: false,
     })
-    @IsOptional()
     @Type(() => Boolean)
-    token?: boolean = false;
-
-    is = (key: string) => ['user', 'token'].includes(key);
+    @Expose({ groups: ['include'] })
+    token = false;
 }
