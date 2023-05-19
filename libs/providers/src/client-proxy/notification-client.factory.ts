@@ -1,9 +1,7 @@
 import { NOTIFICATION_SERVICE } from '@contracts/services/notification';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { Logger } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { ClientProvider, ClientsModuleAsyncOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
 
 export const notificationClientProvider = (config: ConfigService): ClientProvider => {
     return {
