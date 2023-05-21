@@ -1,5 +1,7 @@
 import { TokenService } from '@auth-app/services/token.service';
+import { FindUserNamespace } from '@contracts/services/user';
 import { Logger, NotFoundException } from '@nestjs/common';
+import { HttpException } from '@nestjs/common/exceptions';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { RefreshToken, Tokens, User } from '@shared/interfaces';
@@ -19,10 +21,13 @@ export const refreshTokens = (
             return token;
         }),
         mergeMap((token) =>
-            client.send<User>({ cmd: 'find-user' }, token.userId).pipe(
+            client.send<FindUserNamespace.Response>(FindUserNamespace.MessagePattern, token.userId).pipe(
                 mergeMap(async (user) => {
                     if (!user) {
                         throw new NotFoundException(`Пользователь с id ${token.userId} не найден`);
+                    }
+                    if (user instanceof HttpException) {
+                        throw user;
                     }
                     const refreshToken = tokenService.refreshToken();
                     const accessToken = tokenService.accessToken({
@@ -30,8 +35,10 @@ export const refreshTokens = (
                         userId: user.id,
                         roles: user.roles,
                     });
-                    await prisma.token.delete({ where: { token: token.token } });
-                    await prisma.token.create({ data: { ...refreshToken, userId: user.id } });
+                    await prisma.$transaction([
+                        prisma.token.delete({ where: { token: token.token } }),
+                        prisma.token.create({ data: { ...refreshToken, userId: user.id } }),
+                    ]);
                     return {
                         accessToken,
                         refreshToken,

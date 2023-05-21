@@ -1,3 +1,4 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common/exceptions';
 import { User } from '@shared/interfaces';
 
 export namespace DeleteUserNamespace {
@@ -17,5 +18,5 @@ export namespace DeleteUserNamespace {
     /** #### Описание ответа
      *
      */
-    export type Response = User;
+    export type Response = User | BadRequestException | NotFoundException;
 }

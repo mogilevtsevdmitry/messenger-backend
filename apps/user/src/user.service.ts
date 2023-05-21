@@ -44,8 +44,16 @@ export class UserService {
         return Response.returnMany<User>({ total, opts, rows });
     }
 
-    async findOne(userIdOrEmail: FindUserNamespace.Request): Promise<User> {
-        const { id, email } = this.userValidation.validateUserIdOrEmail(userIdOrEmail) || {};
+    async findOne(
+        userIdOrEmail: FindUserNamespace.Request | string,
+    ): Promise<FindUserNamespace.Response | BadRequestException> {
+        let data: FindUserNamespace.Request;
+
+        if (!(typeof userIdOrEmail === 'string')) {
+            data = this.userValidation.userIdOrEmailToObject(userIdOrEmail);
+        }
+
+        console.log(id, email);
 
         if ((id && !email) || (id && email)) {
             const user = await this.findByPk(id);
@@ -55,6 +63,10 @@ export class UserService {
         if (email && !id) {
             const user = await this.findByEmail(email);
             return Response.returnOne<User>(user);
+        }
+
+        if (!email && !id) {
+            return Response.returnBadRequest(`Не указан email или пароль`);
         }
     }
 

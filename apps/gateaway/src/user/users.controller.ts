@@ -25,7 +25,7 @@ import {
     Put,
     Query,
 } from '@nestjs/common';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientProxy } from '@nestjs/microservices';
 import { ApiTags, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
 import { QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
@@ -46,7 +46,7 @@ export class UsersController {
     @ApiOkResponse({ type: ResponseMany<User> })
     @ApiQuery({ type: PaginationDto })
     @Get(FindUsersMethod.path)
-    async findAll(@Query(QueryPipe) opts?: IQueryPipe): Promise<Observable<ResponseMany<User>>> {
+    async findAll(@Query(QueryPipe) opts?: IQueryPipe): Promise<Observable<ResponseMany<FindUsersNamespace.Response>>> {
         return this.client.send<ResponseMany<FindUsersNamespace.Response>, IQueryPipe>(
             FindUsersNamespace.MessagePattern,
             opts,

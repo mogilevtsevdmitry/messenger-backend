@@ -4,7 +4,7 @@ import { LoginWithEmailNamespace } from '@contracts/services/auth';
 import { FindUserNamespace } from '@contracts/services/user';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
-import { Tokens } from '@shared/interfaces';
+import { Tokens, User } from '@shared/interfaces';
 import { Observable, mergeMap, tap } from 'rxjs';
 
 export const loginWithEmail = (
@@ -18,12 +18,13 @@ export const loginWithEmail = (
             email: loginUserDto.email,
         })
         .pipe(
-            tap((user) => {
+            tap((user: User) => {
+                console.log(user);
                 if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                     throw new RpcException('Не верный email или пароль');
                 }
             }),
-            mergeMap(async (user) => {
+            mergeMap(async (user: User) => {
                 const accessToken = tokenService.accessToken({
                     userId: user.id,
                     email: user.email,
