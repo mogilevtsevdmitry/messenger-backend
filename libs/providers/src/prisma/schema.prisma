@@ -8,22 +8,25 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  nickname  String
-  firstName String
-  lastName  String
-  birthday  DateTime?
-  sex       String?
-  photo     String[]
-  phone     Int?
-  status    String
-  aboutMe   String?
-  password  String
-  roles     String[]
-  token     Token[]
+  id              String            @id @default(uuid())
+  email           String            @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  nickname        String
+  firstName       String
+  lastName        String
+  birthday        DateTime?
+  sex             String?
+  photo           String[]
+  phone           Int?
+  status          String
+  aboutMe         String?
+  password        String
+  roles           String[]
+  token           Token[]
+  Message         Message[]
+  ChatParticipant ChatParticipant[]
+  File            File[]
 
   @@map("users")
 }
@@ -35,4 +38,61 @@ model Token {
   user   User     @relation(fields: [userId], references: [id])
 
   @@map("tokens")
+}
+
+model File {
+  id         String    @id @default(uuid())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  fileName   String
+  fileType   String
+  fileSize   Int
+  filePath   String
+  uploadedAt DateTime  @default(now())
+  Message    Message[]
+
+  @@map("files")
+}
+
+model Chat {
+  id           String            @id @default(uuid())
+  name         String
+  type         ChatType
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  participants ChatParticipant[]
+  messages     Message[]
+
+  @@map("chats")
+}
+
+model ChatParticipant {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  chat   Chat   @relation(fields: [chatId], references: [id])
+  chatId String
+}
+
+model Message {
+  id               String    @id @default(uuid())
+  chat             Chat      @relation(fields: [chatId], references: [id])
+  chatId           String
+  sender           User      @relation(fields: [senderId], references: [id])
+  senderId         String
+  content          String
+  file             File?     @relation(fields: [fileId], references: [id])
+  fileId           String?
+  replyToMessage   Message?  @relation("MessageReplies", fields: [replyToMessageId], references: [id])
+  replyToMessageId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  replies          Message[] @relation("MessageReplies")
+
+  @@map("messages")
+}
+
+enum ChatType {
+  private
+  group
 }
