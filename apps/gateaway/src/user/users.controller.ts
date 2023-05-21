@@ -25,10 +25,10 @@ import {
     Put,
     Query,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ApiTags, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
-import { ParseEmailPipe, QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
+import { QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
 import { map, Observable } from 'rxjs';
 import { UserResponse } from './responses';
 import { ResponseMany } from '@shared/responses';
@@ -59,19 +59,8 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserMethod.path)
-    findOne(@Param('userId', ParseUUIDPipe) userId: string): Observable<any> {
-        console.log(`FF`, userId);
-        return this.client.send(FindUserNamespace.MessagePattern, userId);
-    }
-
-    @ApiOperation({
-        summary: FindUserByEmail.summary,
-        description: FindUserByEmail.description,
-    })
-    @ApiOkResponse({ type: UserResponse })
-    @Get(FindUserByEmail.path)
-    findByEmail(@Param('email', ParseEmailPipe) { email }: Pick<FindUserNamespace.Request, 'email'>): Observable<any> {
-        return this.client.send(RegisterWithEmailNamespace.MessagePattern, email);
+    findOne(@Param('userOrEmail') userIdOrEmail: string): Observable<any> {
+        return this.client.send<FindUserNamespace.Response, string>(FindUserNamespace.MessagePattern, userIdOrEmail);
     }
 
     @ApiOperation({
@@ -82,7 +71,7 @@ export class UsersController {
     @Put(UpdateUserMethod.path)
     updateOne(
         @Param('userId', ParseUUIDPipe) userId: string,
-        @Body() dto: FindUserNamespace.Response,
+        @Body() dto: UpdateUserNamespace.Request,
     ): Observable<any> {
         return this.client.send(UpdateUserNamespace.MessagePattern, { userId, dto }).pipe(
             map((user) => {

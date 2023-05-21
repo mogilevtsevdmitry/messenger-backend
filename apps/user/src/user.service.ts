@@ -1,14 +1,16 @@
 import { RegisterWithEmailNamespace } from '@contracts/services/auth';
-import { Injectable } from '@nestjs/common';
+import { DeleteUserNamespace, FindUserNamespace, UpdateUserNamespace } from '@contracts/services/user';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { User } from '@shared/interfaces';
 import { IQueryPipe } from '@shared/pipes';
 import { Response } from '@shared/responses';
 import { genSalt, hash } from 'bcrypt';
+import { UserValidation } from './cases/user.validation';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService, private readonly userValidation: UserValidation) {}
 
     async create(data: RegisterWithEmailNamespace.Request): Promise<RegisterWithEmailNamespace.Response> {
         const hashedPassword = await hash(data.password, await genSalt(10));
@@ -42,18 +44,32 @@ export class UserService {
         return Response.returnMany<User>({ total, opts, rows });
     }
 
-    async findOne(userId: string) {
+    async findOne(userIdOrEmail: FindUserNamespace.Request): Promise<User> {
+        const { id, email } = this.userValidation.validateUserIdOrEmail(userIdOrEmail) || {};
+
+        if ((id && !email) || (id && email)) {
+            const user = await this.findByPk(id);
+            return Response.returnOne<User>(user);
+        }
+
+        if (email && !id) {
+            const user = await this.findByEmail(email);
+            return Response.returnOne<User>(user);
+        }
+    }
+
+    private async findByPk(userId: string) {
         const user = await this.prisma.user.findUnique({ where: { id: userId } });
         return Response.returnOne<User>(user);
     }
 
-    async findByEmail(email: string) {
+    async findByEmail(email: string): Promise<User> {
         const user = await this.prisma.user.findFirst({ where: { email } });
         return Response.returnOne<User>(user);
     }
 
-    async updateOne(userId: string, dto: any) {
-        const user = await this.prisma.user.update({ data: dto, where: { id: userId } });
+    async updateOne(userId: string, dto: UpdateUserNamespace.Request): Promise<UpdateUserNamespace.Response> {
+        const user = await this.prisma.user.update({ data: { ...dto }, where: { id: userId } });
         return Response.returnOne<User>(user);
     }
 

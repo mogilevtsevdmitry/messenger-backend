@@ -12,7 +12,7 @@ export namespace FindUserNamespace {
     /** #### Описание входящих данных
      *
      */
-    export type Request = User;
+    export type Request = Partial<Pick<User, 'id' | 'email'>>;
 
     /** #### Описание ответа
      *

@@ -5,10 +5,8 @@ import {
     FindUsersNamespace,
     UpdateUserNamespace,
 } from '@contracts/services/user';
-import { FindUserByEmailNamespace } from '@contracts/services/user/methods/find-user-by-email';
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { User } from '@shared/interfaces';
 import { IQueryPipe } from '@shared/pipes';
 import { ResponseMany } from '@shared/responses';
 import { UserService } from './user.service';
@@ -18,32 +16,27 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @MessagePattern(RegisterWithEmailNamespace.MessagePattern)
-    register(data: RegisterWithEmailNamespace.Request): Promise<User> {
-        return this.userService.create(data);
+    register(user: RegisterWithEmailNamespace.Request): Promise<RegisterWithEmailNamespace.Response> {
+        return this.userService.create(user);
     }
 
     @MessagePattern(FindUsersNamespace.MessagePattern)
-    findAll(opts?: IQueryPipe): Promise<ResponseMany<User>> {
+    findAll(opts?: IQueryPipe): Promise<ResponseMany<FindUsersNamespace.Response>> {
         return this.userService.findAll(opts);
     }
 
     @MessagePattern(FindUserNamespace.MessagePattern)
-    findOne({ id }: Pick<FindUserNamespace.Request, 'id'>): Promise<User> {
-        return this.userService.findOne(id);
-    }
-
-    @MessagePattern(FindUserByEmailNamespace.MessagePattern)
-    findByEmail({ email }: FindUserByEmailNamespace.Request): Promise<User> {
-        return this.userService.findByEmail(email);
+    findOne(userIdOrEmail: FindUserNamespace.Request): Promise<FindUserNamespace.Response> {
+        return this.userService.findOne(userIdOrEmail);
     }
 
     @MessagePattern(UpdateUserNamespace.MessagePattern)
-    updateOne({ id }: Pick<FindUserNamespace.Request, 'id'>, user: User) {
-        return this.userService.updateOne(id, user);
+    updateOne(userIdOrEmail: string, user: UpdateUserNamespace.Request): Promise<UpdateUserNamespace.Response> {
+        return this.userService.updateOne(userIdOrEmail, user);
     }
 
     @MessagePattern(DeleteUserNamespace.MessagePattern)
-    deleteOne({ id }: Pick<FindUserNamespace.Request, 'id'>): Promise<User> {
-        return this.userService.deleteOne(id);
+    deleteOne(userIdOrEmail: string): Promise<DeleteUserNamespace.Response> {
+        return this.userService.deleteOne(userIdOrEmail);
     }
 }

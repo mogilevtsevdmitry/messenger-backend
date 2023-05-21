@@ -8,6 +8,7 @@ export const register = (
     registerUserDto: RegisterWithEmailNamespace.Request,
     client: ClientProxy,
 ): Observable<unknown> => {
+    console.log(registerUserDto);
     return client.send<User>(FindUserNamespace.MessagePattern, registerUserDto.email).pipe(
         tap((user) => {
             if (user) {

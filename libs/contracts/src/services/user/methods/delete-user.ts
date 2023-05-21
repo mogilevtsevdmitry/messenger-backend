@@ -12,7 +12,7 @@ export namespace DeleteUserNamespace {
     /** #### Описание входящих данных
      *
      */
-    export type Request = User;
+    export type Request = Pick<User, 'id'>;
 
     /** #### Описание ответа
      *
