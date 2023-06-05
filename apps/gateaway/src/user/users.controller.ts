@@ -10,8 +10,8 @@ import {
     DeleteUserNamespace,
     FindUserNamespace,
     FindUsersNamespace,
-    UpdateUserNamespace,
     USER_SERVICE,
+    UpdateUserNamespace,
 } from '@contracts/services/user';
 import {
     Body,
@@ -26,15 +26,17 @@ import {
     Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { ApiTags, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { handleTimeoutAndErrors } from '@shared/helpers';
-import { ParseEmailPipe, QueryPipe, IQueryPipe, PaginationDto } from '@shared/pipes';
-import { map } from 'rxjs';
-import { UserResponse } from './responses';
-import { ResponseMany } from '@shared/responses';
 import { User } from '@shared/interfaces';
+import { IQueryPipe, PaginationDto, ParseEmailPipe, QueryPipe } from '@shared/pipes';
+import { ResponseMany } from '@shared/responses';
+import { map } from 'rxjs';
+import { UpdateUserDto } from './dto';
+import { UserResponse } from './responses';
 
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
     constructor(@Inject(USER_SERVICE) private client: ClientProxy) {}
@@ -76,7 +78,7 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Put(UpdateUserMethod.path)
-    async updateOne(@Param('userId', ParseUUIDPipe) userId: string, @Body() dto: Exclude<UserResponse, 'id'>) {
+    async updateOne(@Param('userId', ParseUUIDPipe) userId: string, @Body() dto: UpdateUserDto) {
         return this.client.send(UpdateUserNamespace.MessagePattern, { userId, dto }).pipe(
             map((user) => {
                 if (!user) {

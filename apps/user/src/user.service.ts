@@ -53,7 +53,15 @@ export class UserService {
     }
 
     async updateOne(userId: string, dto: any) {
-        const user = await this.prisma.user.update({ data: dto, where: { id: userId } });
+        const { password = null, ...toUpdate } = dto;
+        let hashedPassword = undefined;
+        if (password) {
+            hashedPassword = await hash(password, await genSalt(10));
+        }
+        const user = await this.prisma.user.update({
+            data: { ...toUpdate, password: hashedPassword },
+            where: { id: userId },
+        });
         return Response.returnOne<User>(user);
     }
 
