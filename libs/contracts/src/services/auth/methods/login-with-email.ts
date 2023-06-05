@@ -1,4 +1,3 @@
-import { SendEmailNamespace } from '@contracts/services/notification';
 import { RefreshToken } from '@shared/interfaces';
 
 export namespace LoginWithEmailNamespace {
@@ -7,7 +6,7 @@ export namespace LoginWithEmailNamespace {
      * Передается в @MessagePattern
      */
     export const MessagePattern = {
-        cmd: ['login-with-email', SendEmailNamespace.MessagePattern.cmd],
+        cmd: 'login-with-email',
     };
 
     /** #### Описание входящих данных

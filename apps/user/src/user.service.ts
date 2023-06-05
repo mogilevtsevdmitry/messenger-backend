@@ -1,6 +1,6 @@
 import { RegisterWithEmailNamespace } from '@contracts/services/auth';
 import { DeleteUserNamespace, FindUserNamespace, UpdateUserNamespace } from '@contracts/services/user';
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@providers/prisma/prisma.service';
 import { User } from '@shared/interfaces';
 import { IQueryPipe } from '@shared/pipes';
@@ -44,30 +44,27 @@ export class UserService {
         return Response.returnMany<User>({ total, opts, rows });
     }
 
-    async findOne(
-        userIdOrEmail: FindUserNamespace.Request | string,
-    ): Promise<FindUserNamespace.Response | BadRequestException> {
-        let data: FindUserNamespace.Request;
-
-        if (!(typeof userIdOrEmail === 'string')) {
-            data = this.userValidation.userIdOrEmailToObject(userIdOrEmail);
+    async findOne(userIdOrEmail: FindUserNamespace.Request | string): Promise<FindUserNamespace.Response> {
+        if (typeof userIdOrEmail == 'string') {
+            const foundUser = await this.findByPk(userIdOrEmail);
+            return Response.returnOne<User>(foundUser);
         }
 
-        console.log(id, email);
+        if (typeof userIdOrEmail == 'object') {
+            const user = this.userValidation.userIdOrEmailToObject(userIdOrEmail);
 
-        if ((id && !email) || (id && email)) {
-            const user = await this.findByPk(id);
-            return Response.returnOne<User>(user);
+            if ((user.id && !user.email) || (user.id && user.email)) {
+                const foundUser = await this.findByPk(user.id);
+                return Response.returnOne<User>(foundUser);
+            }
+
+            if (user.email && !user.id) {
+                const foundUser = await this.findByEmail(user.email);
+                return Response.returnOne<User>(foundUser);
+            }
         }
 
-        if (email && !id) {
-            const user = await this.findByEmail(email);
-            return Response.returnOne<User>(user);
-        }
-
-        if (!email && !id) {
-            return Response.returnBadRequest(`Не указан email или пароль`);
-        }
+        return Response.returnBadRequest(`Не указан email или пароль`);
     }
 
     private async findByPk(userId: string) {
