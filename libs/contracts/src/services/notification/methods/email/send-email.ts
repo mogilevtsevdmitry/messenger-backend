@@ -1,9 +1,9 @@
 export namespace SendEmailNamespace {
     /** #### Команда авторизации
      *
-     * Передается в @MessagePattern
+     * Передается в @EventPattern
      */
-    export const MessagePattern = {
-        cmd: 'send-email',
+    export const EventPattern = {
+        cmd: 'user_registred',
     };
 }

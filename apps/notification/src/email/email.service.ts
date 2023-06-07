@@ -6,7 +6,7 @@ export class EmailService {
     constructor(private readonly mailerService: MailerService) {}
 
     async send() {
-        this.mailerService.sendMail({
+        await this.mailerService.sendMail({
             to: 'zitpot.ru@gmail.com',
             from: 'noreply@nestjs.com',
             subject: 'Testing Nest MailerModule ✔',

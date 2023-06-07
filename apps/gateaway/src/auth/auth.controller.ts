@@ -5,6 +5,7 @@ import {
     RefreshTokensNamespace,
     RegisterWithEmailNamespace,
 } from '@contracts/services/auth';
+import { SendEmailNamespace } from '@contracts/services/notification';
 import { Body, Controller, HttpStatus, Inject, Logger, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxy } from '@nestjs/microservices';
@@ -50,7 +51,7 @@ export class AuthController {
     @ApiOkResponse({ type: RegisterResponse })
     @Post(RegisterWithEmailMethod.path)
     async registerByEmail(@Body() data: RegisterWithEmailDto) {
-        return this.client
+        const authed = this.client
             .send<RegisterWithEmailNamespace.Response, RegisterWithEmailNamespace.Request>(
                 RegisterWithEmailNamespace.MessagePattern,
                 data,
@@ -59,6 +60,10 @@ export class AuthController {
                 map((user) => !!user),
                 handleTimeoutAndErrors(),
             );
+
+        this.client.emit(SendEmailNamespace.EventPattern.cmd, data);
+
+        return authed;
     }
 
     @ApiOperation({
