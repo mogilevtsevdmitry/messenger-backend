@@ -4,7 +4,7 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions';
 import { ClientProxy } from '@nestjs/microservices';
 import { PrismaService } from '@providers/prisma/prisma.service';
-import { RefreshToken, Tokens, User } from '@shared/interfaces';
+import { RefreshToken, Tokens } from '@shared/interfaces';
 import { catchError, from, map, mergeMap, Observable, of } from 'rxjs';
 
 export const refreshTokens = (

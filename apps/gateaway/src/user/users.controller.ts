@@ -59,8 +59,11 @@ export class UsersController {
     })
     @ApiOkResponse({ type: UserResponse })
     @Get(FindUserMethod.path)
-    findOne(@Param('userOrEmail') userIdOrEmail: string): Observable<any> {
-        return this.client.send<FindUserNamespace.Response, string>(FindUserNamespace.MessagePattern, userIdOrEmail);
+    findOne(@Param() userIdOrEmail: FindUserNamespace.Request): Observable<any> {
+        return this.client.send<FindUserNamespace.Response, FindUserNamespace.Request>(
+            FindUserNamespace.MessagePattern,
+            userIdOrEmail,
+        );
     }
 
     @ApiOperation({

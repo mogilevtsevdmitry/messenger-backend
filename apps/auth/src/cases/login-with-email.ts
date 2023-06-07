@@ -19,7 +19,6 @@ export const loginWithEmail = (
         })
         .pipe(
             tap((user: User) => {
-                console.log(user);
                 if (!user || !AuthHelper.compare(loginUserDto.password, user.password)) {
                     throw new RpcException('Не верный email или пароль');
                 }
