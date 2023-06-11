@@ -10,20 +10,21 @@ datasource db {
 model User {
   id        String    @id @default(uuid())
   email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
   nickname  String
-  firstName String
-  lastName  String
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
   birthday  DateTime?
   sex       String?
   photo     String[]
   phone     Int?
   status    String
-  aboutMe   String?
+  aboutMe   String?   @map("about_me")
   password  String
   roles     String[]
   token     Token[]
+  Chat      Chat[]
 
   @@map("users")
 }
@@ -31,8 +32,22 @@ model User {
 model Token {
   token  String   @unique
   exp    DateTime
-  userId String
+  userId String   @map("user_id")
   user   User     @relation(fields: [userId], references: [id])
 
   @@map("tokens")
+}
+
+model Chat {
+  id        String   @id @default(uuid())
+  message   String
+  files     String[]
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  icons     String[]
+  children  String[]
+
+  @@map("chat")
 }
