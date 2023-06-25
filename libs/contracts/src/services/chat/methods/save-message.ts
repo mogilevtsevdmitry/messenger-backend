@@ -12,6 +12,11 @@ export namespace SaveMessageNamespace {
      */
     export interface Request {
         /**
+         * Идентификатор сообщения
+         */
+        id?: string;
+
+        /**
          * Сообщение
          */
         content: string;
@@ -25,6 +30,21 @@ export namespace SaveMessageNamespace {
          * Отправитель
          */
         recipientId: string;
+
+        /**
+         * Файлы
+         */
+        files?: string[];
+
+        /**
+         * Иконки
+         */
+        icons?: string[];
+
+        /**
+         * Идентификатор сообщения на который был ответ
+         */
+        parentMessageId?: string;
     }
 
     /** #### Описание ответа
