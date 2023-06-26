@@ -12,9 +12,8 @@ import {
 } from '@nestjs/websockets';
 import { SocketCurrentUser, extractUserFromSocket } from '@shared/decorators';
 import { User } from '@shared/interfaces';
-import { Subject, catchError, mergeMap, of, takeUntil, tap } from 'rxjs';
+import { Subject, catchError, takeUntil, tap } from 'rxjs';
 import { Socket } from 'socket.io';
-import { DirectMessageDto } from './dto';
 
 @WebSocketGateway(ChatGatewayNamespace.Port, { namespace: ChatGatewayNamespace.Namespace, cors: true })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
@@ -46,26 +45,33 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     // Личный чат
     @SubscribeMessage(ChatGatewayNamespace.DirectMessage)
-    handlePrivateChat(@SocketCurrentUser('userId') userId: string, @MessageBody() payload: DirectMessageDto): void {
+    handlePrivateChat(
+        @SocketCurrentUser('userId') userId: string,
+        @MessageBody() payload: SaveMessageNamespace.Request,
+    ): void {
         if (!userId) {
             throw new UnauthorizedException();
         }
-        const { recipientId, text } = payload;
-        const recipient = this.clients.get(recipientId);
-        if (recipient) {
-            this.chatClient
-                .emit<SaveMessageNamespace.Response, SaveMessageNamespace.Request>(
-                    SaveMessageNamespace.MessagePattern,
-                    { content: text, recipientId, senderId: userId },
-                )
-                .pipe(
-                    tap(() => recipient.socket.emit(ChatGatewayNamespace.DirectMessage, { senderId: userId, text })),
-                    takeUntil(this.destroy$),
-                    catchError((err) => {
-                        throw new BadRequestException(err);
-                    }),
-                );
-        }
+        const recipient = this.clients.get(payload.recipientId);
+        this.chatClient
+            .emit(SaveMessageNamespace.MessagePattern, {
+                ...payload,
+                senderId: userId,
+            })
+            .pipe(
+                tap(() => {
+                    if (recipient) {
+                        recipient.socket.emit(ChatGatewayNamespace.DirectMessage, {
+                            ...payload,
+                            senderId: userId,
+                        });
+                    }
+                }),
+                takeUntil(this.destroy$),
+                catchError((err) => {
+                    throw new BadRequestException(err);
+                }),
+            );
     }
 
     onModuleDestroy() {

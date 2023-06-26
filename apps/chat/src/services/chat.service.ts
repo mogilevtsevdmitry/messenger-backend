@@ -7,7 +7,7 @@ export class ChatService {
     constructor(private readonly prisma: PrismaService) {}
 
     async newMessage(message: SaveMessageNamespace.Request) {
-        const { content, recipientId, senderId, id, files = [], icons = [], parentMessageId = null } = message;
+        const { content, recipientId, senderId, id = '', files = [], icons = [], parentMessageId = null } = message;
         const chatName = [recipientId, senderId].sort().join('-');
 
         const chat = await this.prisma.chat.upsert({

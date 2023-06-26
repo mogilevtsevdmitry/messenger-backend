@@ -1,1 +1,1 @@
-export * from './direct-messae.dto';
+export * from './get-messages.dto';

@@ -29,12 +29,12 @@ export const getEmailConfig = async (config: ConfigService) => {
         throw new Error('Необходимо определить переменную "NOTIFICATION_SERVICE_EMAIL_TRANSPORT" в .env');
     }
     const name = config.get<string>('NOTIFICATION_SERVICE_EMAIL_FROM_NAME');
-    const address = transport.split(':')[1].split('//')[1];
+    // const address = transport.split(':')[1].split('//')[1];
 
     return {
         transport,
         defaults: {
-            from: `"${name}" <${address}>`,
+            from: `"${name}" <email`,
         },
         template: {
             dir: 'apps/notification/src/templates/**',

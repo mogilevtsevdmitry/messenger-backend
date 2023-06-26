@@ -46,14 +46,4 @@ export namespace SaveMessageNamespace {
          */
         parentMessageId?: string;
     }
-
-    /** #### Описание ответа
-     *
-     */
-    export interface Response {
-        /**
-         * Идентификатор созданного сообщения
-         */
-        id: string;
-    }
 }
